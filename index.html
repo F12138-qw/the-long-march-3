@@ -1,0 +1,3285 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>重走长征路｜俯视角长征沙盘RPG</title>
+<meta name="description" content="《中国近现代史纲要》思政实践作品：遵循长征真实历史时序，在七个关键节点探索、抉择、收集史料，重走二万五千里。">
+<meta name="theme-color" content="#5e0808">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23600a0a'/%3E%3Cpath d='M32 11l5.8 14.2 15.2 1.2-11.5 9.9 3.5 15L32 43.4 18.9 51.3l3.5-15L10.9 26.4l15.2-1.2z' fill='%23d7b774'/%3E%3C/svg%3E">
+<style>
+/* =========================================================
+   重走长征路 · 俯视角长征沙盘
+   单文件：HTML + CSS + Canvas + 原生 JavaScript
+   ========================================================= */
+:root{
+  --bg:#14100c;
+  --bg-2:#1d1711;
+  --panel:#241c15;
+  --paper:#f2e8d5;
+  --paper-2:#faf4e8;
+  --ink:#271d14;
+  --ink-soft:#4d3e30;
+  --muted:#7c6a55;
+  --faint:#a08b70;
+  --line:rgba(111,82,48,.22);
+  --line-strong:rgba(111,82,48,.4);
+  --red:#8b1713;
+  --red-bright:#b32820;
+  --red-deep:#590707;
+  --gold:#c8a35b;
+  --gold-light:#e2c78f;
+  --gold-pale:#f2e3bd;
+  --green:#667a4f;
+  --shadow:0 18px 60px rgba(0,0,0,.34);
+  --serif:"Noto Serif SC","Source Han Serif SC","Songti SC","STSong","SimSun",serif;
+  --sans:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",system-ui,sans-serif;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;background:var(--bg);}
+body{
+  margin:0;min-height:100vh;color:var(--ink);font-family:var(--sans);
+  background:
+    radial-gradient(1000px 520px at 15% -10%,rgba(139,23,19,.22),transparent 68%),
+    radial-gradient(900px 520px at 100% 0,rgba(200,163,91,.10),transparent 70%),
+    repeating-linear-gradient(45deg,rgba(255,255,255,.012) 0 1px,transparent 1px 8px),
+    var(--bg);
+  -webkit-font-smoothing:antialiased;
+}
+[hidden]{display:none!important;}
+button,input{font:inherit;}
+button{color:inherit;}
+button{cursor:pointer;}
+p,h1,h2,h3,h4,blockquote,figure{margin-top:0;}
+img,svg,canvas{display:block;max-width:100%;}
+::selection{background:rgba(200,163,91,.42);color:#2a1b0e;}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px;}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+
+/* ---------- 顶部 ---------- */
+.topbar{
+  position:relative;z-index:20;
+  background:
+    radial-gradient(900px 160px at 80% -80%,rgba(255,255,255,.11),transparent 65%),
+    linear-gradient(108deg,#470606 0%,#6f0e0e 50%,#4b0707 100%);
+  color:#fff6e4;border-bottom:3px solid var(--gold);
+  box-shadow:0 4px 22px rgba(0,0,0,.35);
+}
+.topbar::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(115deg,transparent 0 30px,rgba(255,255,255,.015) 30px 31px);
+}
+.topbar-inner{
+  position:relative;z-index:1;max-width:1420px;margin:0 auto;padding:13px 24px;
+  display:flex;align-items:center;justify-content:space-between;gap:24px;
+}
+.brand{display:flex;align-items:center;gap:13px;min-width:0;}
+.brand-mark{
+  width:44px;height:44px;flex:0 0 auto;border-radius:50%;display:grid;place-items:center;
+  border:1px solid rgba(226,199,143,.62);
+  background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.18),rgba(0,0,0,.16));
+  box-shadow:inset 0 0 0 4px rgba(200,163,91,.06);
+}
+.brand-mark svg{width:25px;height:25px;fill:var(--gold-light);}
+.brand-copy{min-width:0;}
+.brand-title{margin:0;font-family:var(--serif);font-size:22px;font-weight:700;letter-spacing:.15em;line-height:1.25;}
+.brand-sub{margin:2px 0 0;font-size:9px;letter-spacing:.22em;color:rgba(248,236,215,.62);}
+.top-actions{display:flex;align-items:center;gap:9px;flex-wrap:wrap;}
+.top-btn{
+  display:inline-flex;align-items:center;gap:6px;min-height:35px;padding:0 13px;
+  border:1px solid rgba(255,255,255,.25);border-radius:2px;background:rgba(255,255,255,.015);
+  color:rgba(255,248,235,.88);font-size:11px;letter-spacing:.08em;
+  transition:border-color .2s,background .2s,color .2s;
+}
+.top-btn:hover{border-color:rgba(226,199,143,.7);background:rgba(200,163,91,.1);color:var(--gold-pale);}
+.top-btn.danger:hover{border-color:rgba(255,170,150,.65);background:rgba(179,40,32,.18);color:#ffe2d8;}
+.top-btn svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
+
+/* ---------- 主布局 ---------- */
+.shell{
+  max-width:1420px;margin:0 auto;padding:18px 24px 36px;
+  display:grid;grid-template-columns:minmax(0,1fr) 326px;gap:16px;align-items:start;
+}
+.play-column{min-width:0;}
+.game-meta{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:0 2px 10px;color:rgba(245,235,217,.62);font-size:10px;letter-spacing:.1em;
+}
+.game-meta .dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:#9cbb78;margin-right:7px;box-shadow:0 0 0 4px rgba(156,187,120,.08);vertical-align:1px;}
+.game-meta .meta-right{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.game-meta .meta-right span{white-space:nowrap;}
+.game-frame{
+  position:relative;overflow:hidden;border:1px solid rgba(200,163,91,.27);border-radius:3px;
+  background:#151411;box-shadow:var(--shadow);
+  height:clamp(430px,calc(100vh - 190px),760px);
+}
+.game-frame::before{
+  content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
+  box-shadow:inset 0 0 74px rgba(8,6,4,.6);
+}
+#gameCanvas{width:100%;height:100%;outline:none;background:#1b1a14;image-rendering:pixelated;cursor:default;}
+#gameCanvas:focus{cursor:default;}
+
+/* ---------- Canvas HUD ---------- */
+.hud-top{
+  position:absolute;left:13px;right:13px;top:12px;z-index:4;
+  display:flex;align-items:flex-start;justify-content:space-between;gap:10px;pointer-events:none;
+}
+.hud-chip{
+  display:inline-flex;align-items:center;gap:7px;max-width:56%;
+  padding:6px 10px;border:1px solid rgba(200,163,91,.28);border-radius:2px;
+  background:rgba(23,18,13,.74);color:#f4e9d3;backdrop-filter:blur(5px);
+  font-size:10px;letter-spacing:.07em;line-height:1.5;
+}
+.hud-chip svg{width:13px;height:13px;flex:0 0 auto;fill:none;stroke:var(--gold);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
+.hud-chip .sub{color:rgba(244,233,211,.56);font-size:9px;}
+.hud-chip.objective{max-width:49%;justify-content:flex-end;text-align:right;background:rgba(61,9,8,.7);}
+.hud-chip.objective strong{font-weight:500;color:#f4e2b8;}
+.hazard-chip{
+  position:absolute;left:50%;top:58px;transform:translateX(-50%);z-index:4;pointer-events:none;
+  display:flex;align-items:center;gap:6px;padding:4px 10px;border:1px solid rgba(237,173,130,.35);
+  background:rgba(74,24,17,.8);color:#f0c5a4;font-size:9px;letter-spacing:.1em;border-radius:2px;
+  animation:hazardPulse 2.2s ease-in-out infinite;white-space:nowrap;
+}
+.hazard-chip::before{content:"▲";font-size:7px;color:#e38c63;}
+.area-banner{
+  position:absolute;left:50%;top:97px;transform:translate(-50%,-8px);z-index:5;pointer-events:none;
+  padding:9px 22px;border-top:1px solid rgba(226,199,143,.64);border-bottom:1px solid rgba(226,199,143,.35);
+  background:linear-gradient(90deg,transparent,rgba(24,17,11,.87) 16%,rgba(24,17,11,.87) 84%,transparent);
+  color:#f4e5c7;text-align:center;opacity:0;transition:opacity .45s,transform .45s;
+}
+.area-banner.show{opacity:1;transform:translate(-50%,0);}
+.area-banner strong{display:block;font-family:var(--serif);font-size:20px;letter-spacing:.16em;font-weight:600;}
+.area-banner small{display:block;margin-top:1px;font-size:8px;letter-spacing:.2em;color:var(--gold);}
+.game-toast{
+  position:absolute;left:50%;bottom:77px;transform:translate(-50%,8px);z-index:8;
+  max-width:min(470px,calc(100% - 32px));padding:8px 14px;pointer-events:none;
+  background:rgba(24,18,13,.9);border:1px solid rgba(200,163,91,.32);border-radius:2px;
+  color:#f1e2c8;font-size:10px;line-height:1.6;text-align:center;letter-spacing:.04em;
+  opacity:0;transition:opacity .25s,transform .25s;
+}
+.game-toast.show{opacity:1;transform:translate(-50%,0);}
+.interact-prompt{
+  position:absolute;left:50%;bottom:34px;transform:translateX(-50%);z-index:4;
+  display:flex;align-items:center;gap:7px;padding:5px 10px;border:1px solid rgba(200,163,91,.28);
+  background:rgba(24,18,13,.8);color:#f0e1c6;font-size:9px;letter-spacing:.07em;border-radius:2px;
+  opacity:0;pointer-events:none;transition:opacity .2s;
+}
+.interact-prompt.show{opacity:1;}
+.interact-prompt kbd{margin:0;padding:1px 5px;border:1px solid rgba(255,255,255,.25);border-radius:2px;background:rgba(255,255,255,.08);font-family:var(--sans);font-size:8px;color:#fff4db;}
+.canvas-help{
+  position:absolute;right:13px;bottom:11px;z-index:4;color:rgba(242,232,213,.44);
+  font-size:8px;letter-spacing:.08em;pointer-events:none;text-align:right;line-height:1.7;
+}
+.boot-screen{
+  position:absolute;inset:0;z-index:9;display:grid;place-items:center;
+  background:radial-gradient(circle at center,#241c15,#13100c 72%);
+  color:#d9c49b;transition:opacity .5s;
+}
+.boot-screen strong{display:block;font-family:var(--serif);font-size:19px;letter-spacing:.3em;font-weight:500;text-align:center;}
+.boot-screen small{display:block;margin-top:8px;color:rgba(217,196,155,.5);font-size:9px;letter-spacing:.2em;text-align:center;}
+.boot-screen.hide{opacity:0;pointer-events:none;}
+
+/* ---------- 触摸控制 ---------- */
+.touch-controls{
+  position:absolute;left:14px;bottom:14px;z-index:6;
+  display:none;grid-template-columns:repeat(3,42px);grid-template-rows:repeat(3,42px);gap:4px;
+  touch-action:none;user-select:none;
+}
+.touch-controls button{
+  border:1px solid rgba(226,199,143,.28);background:rgba(25,19,13,.66);border-radius:3px;
+  color:#e8d7b5;font-size:14px;backdrop-filter:blur(3px);
+}
+.touch-controls button:active{background:rgba(139,23,19,.6);}
+.touch-up{grid-column:2;grid-row:1;}
+.touch-left{grid-column:1;grid-row:2;}
+.touch-down{grid-column:2;grid-row:3;}
+.touch-right{grid-column:3;grid-row:2;}
+.touch-interact{
+  position:absolute;right:15px;bottom:17px;z-index:6;display:none;
+  width:52px;height:52px;border-radius:50%;border:1px solid rgba(226,199,143,.4);
+  background:rgba(91,23,17,.7);color:#f4e2bf;font-size:11px;letter-spacing:.05em;backdrop-filter:blur(3px);
+  touch-action:none;user-select:none;
+}
+@media (hover:none),(pointer:coarse){
+  .touch-controls{display:grid;}
+  .touch-interact{display:block;}
+  .canvas-help{display:none;}
+  .interact-prompt{bottom:86px;}
+}
+
+/* ---------- 目标条 ---------- */
+.objective-bar{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  margin-top:10px;padding:11px 14px;border:1px solid rgba(200,163,91,.16);
+  background:rgba(37,29,21,.7);color:#eadbc0;
+}
+.objective-main{min-width:0;}
+.objective-main .kicker{display:block;color:var(--gold);font-size:8px;letter-spacing:.2em;}
+.objective-main strong{display:block;margin-top:2px;font-family:var(--serif);font-size:14px;font-weight:500;letter-spacing:.04em;color:#f6e9d2;}
+.objective-main span{display:block;margin-top:1px;color:rgba(234,219,192,.55);font-size:9px;line-height:1.6;}
+.objective-side{display:flex;align-items:center;gap:16px;flex-shrink:0;}
+.mini-progress{display:flex;gap:4px;align-items:center;}
+.mini-progress i{display:block;width:18px;height:3px;border-radius:8px;background:rgba(255,255,255,.11);}
+.mini-progress i.done{background:var(--gold);}
+.mini-progress i.current{background:#b43a2e;animation:miniPulse 1.8s infinite;}
+.objective-side .count{font-family:var(--serif);font-size:15px;color:var(--gold-light);white-space:nowrap;font-variant-numeric:tabular-nums;}
+
+/* ---------- 侧栏 ---------- */
+.sidebar{display:flex;flex-direction:column;gap:11px;min-width:0;}
+.side-card{
+  border:1px solid rgba(200,163,91,.18);background:
+    radial-gradient(380px 130px at 100% 0,rgba(200,163,91,.08),transparent 70%),
+    rgba(35,27,20,.84);
+  box-shadow:0 10px 34px rgba(0,0,0,.16);
+}
+.side-head{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:11px 13px 9px;border-bottom:1px solid rgba(200,163,91,.12);
+}
+.side-head h2{margin:0;font-family:var(--serif);font-size:13px;font-weight:600;letter-spacing:.12em;color:#e9d6b1;}
+.side-head span{font-size:8px;letter-spacing:.12em;color:rgba(234,219,192,.42);}
+.resource-list{display:flex;flex-direction:column;gap:1px;padding:7px 9px 10px;background:rgba(200,163,91,.025);}
+.res-card{display:flex;align-items:center;gap:9px;padding:8px 5px;position:relative;}
+.res-icon{
+  width:30px;height:30px;flex:0 0 auto;border-radius:50%;display:grid;place-items:center;
+  border:1px solid rgba(200,163,91,.27);background:rgba(200,163,91,.06);color:var(--gold-light);
+}
+.res-icon svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
+.res-main{flex:1;min-width:0;}
+.res-top{display:flex;align-items:baseline;justify-content:space-between;gap:8px;}
+.res-top span{font-size:9px;letter-spacing:.12em;color:rgba(234,219,192,.54);}
+.res-top strong{font-family:var(--serif);font-size:18px;font-weight:600;color:#f1e3c7;font-variant-numeric:tabular-nums;line-height:1.2;}
+.res-top small{font-size:8px;color:rgba(234,219,192,.38);font-weight:400;}
+.res-bar{height:3px;margin-top:4px;border-radius:8px;background:rgba(255,255,255,.08);overflow:hidden;}
+.res-bar i{display:block;height:100%;border-radius:8px;background:linear-gradient(90deg,#9f7733,#e1c589);transition:width .5s ease;}
+.res-card.low .res-top strong{color:#ff9b83;animation:lowBlink 1.15s infinite;}
+.res-card.low .res-bar i{background:linear-gradient(90deg,#9c261d,#e16b54);}
+.res-delta{
+  position:absolute;right:4px;top:3px;font-size:8px;color:#f2b3a1;opacity:0;
+  transform:translateY(4px);pointer-events:none;font-variant-numeric:tabular-nums;
+}
+.res-delta.show{animation:deltaFloat 1.6s ease both;}
+
+/* 进度 */
+.timeline{padding:7px 12px 10px;display:flex;flex-direction:column;}
+.tl-row{display:grid;grid-template-columns:18px 1fr auto;gap:7px;align-items:start;position:relative;padding:5px 0 7px;min-height:32px;}
+.tl-row::before{content:"";position:absolute;left:8px;top:23px;bottom:-4px;width:1px;background:rgba(200,163,91,.17);}
+.tl-row:last-child::before{display:none;}
+.tl-dot{
+  width:16px;height:16px;border-radius:50%;border:1px solid rgba(200,163,91,.35);
+  display:grid;place-items:center;font-size:8px;color:rgba(234,219,192,.4);background:#241c15;position:relative;z-index:1;
+}
+.tl-row.done .tl-dot{background:#8b1713;color:#f6e6c6;border-color:rgba(226,199,143,.5);}
+.tl-row.current .tl-dot{border-color:var(--gold);background:#382718;color:var(--gold-light);animation:currentDot 2s infinite;}
+.tl-row.locked .tl-dot{opacity:.55;}
+.tl-name{font-family:var(--serif);font-size:11px;color:rgba(244,233,211,.74);line-height:1.4;letter-spacing:.03em;}
+.tl-row.current .tl-name{color:#f6e7c8;font-weight:600;}
+.tl-row.locked .tl-name{color:rgba(244,233,211,.36);}
+.tl-date{font-size:8px;color:rgba(234,219,192,.32);white-space:nowrap;margin-top:1px;}
+.tl-sub{display:block;margin-top:1px;font-size:8px;color:rgba(234,219,192,.35);}
+.tl-row.done .tl-sub{color:rgba(200,163,91,.65);}
+.tl-lock{font-size:8px;color:rgba(234,219,192,.32);margin-top:2px;}
+
+/* 背包 */
+.bag-head{padding:10px 13px 8px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(200,163,91,.12);}
+.bag-head h2{margin:0;font-family:var(--serif);font-size:13px;letter-spacing:.12em;color:#e9d6b1;font-weight:600;}
+.bag-count{font-size:8px;color:rgba(234,219,192,.45);font-variant-numeric:tabular-nums;}
+.bag-list{padding:6px;display:flex;flex-direction:column;gap:4px;max-height:194px;overflow:auto;scrollbar-width:thin;scrollbar-color:rgba(200,163,91,.4) transparent;}
+.bag-list::-webkit-scrollbar{width:4px;}
+.bag-list::-webkit-scrollbar-thumb{background:rgba(200,163,91,.4);border-radius:3px;}
+.bag-empty{padding:16px 9px;text-align:center;color:rgba(234,219,192,.31);font-size:9px;line-height:1.8;}
+.bag-item{
+  width:100%;display:grid;grid-template-columns:22px 1fr;gap:7px;align-items:center;
+  padding:6px 7px;border:1px solid transparent;background:rgba(255,255,255,.018);
+  text-align:left;transition:border-color .2s,background .2s;
+}
+.bag-item:hover{border-color:rgba(200,163,91,.26);background:rgba(200,163,91,.055);}
+.bag-item .paper-ico{width:19px;height:22px;border:1px solid rgba(200,163,91,.3);background:rgba(200,163,91,.08);display:grid;place-items:center;font-family:var(--serif);font-size:8px;color:var(--gold-light);}
+.bag-item strong{display:block;font-family:var(--serif);font-size:10px;font-weight:500;color:rgba(244,233,211,.82);line-height:1.45;}
+.bag-item small{display:block;font-size:7px;color:rgba(234,219,192,.34);margin-top:1px;}
+.side-actions{padding:8px 9px 10px;display:grid;grid-template-columns:1fr 1fr;gap:6px;border-top:1px solid rgba(200,163,91,.1);}
+.side-btn{
+  min-height:31px;border:1px solid rgba(200,163,91,.2);border-radius:2px;
+  background:rgba(255,255,255,.018);color:rgba(241,228,204,.68);font-size:9px;letter-spacing:.05em;
+  transition:border-color .2s,color .2s,background .2s;
+}
+.side-btn:hover{border-color:rgba(200,163,91,.45);color:var(--gold-pale);background:rgba(200,163,91,.06);}
+.side-btn.primary{border-color:rgba(200,163,91,.42);color:var(--gold-pale);}
+.side-btn.danger:hover{border-color:rgba(220,110,88,.5);color:#ffc9b7;background:rgba(139,23,19,.12);}
+.source-note{padding:9px 12px 12px;color:rgba(234,219,192,.3);font-size:8px;line-height:1.7;letter-spacing:.02em;border-top:1px solid rgba(200,163,91,.08);}
+.source-note strong{color:rgba(200,163,91,.55);font-weight:500;}
+.storage-note{padding:0 12px 10px;font-size:8px;color:rgba(234,219,192,.3);}
+.storage-note.warn{color:#e2a184;}
+
+/* ---------- 弹窗 ---------- */
+.modal-layer{
+  position:fixed;inset:0;z-index:220;display:grid;place-items:center;padding:18px;
+}
+body.modal-open{overflow:hidden;}
+.modal-backdrop{position:absolute;inset:0;background:rgba(11,8,5,.68);backdrop-filter:blur(4px);animation:fadeIn .25s ease both;}
+.modal-card{
+  position:relative;z-index:1;width:min(680px,100%);max-height:calc(100% - 8px);overflow:auto;
+  border:1px solid rgba(200,163,91,.48);border-top:3px solid var(--gold);
+  background:
+    radial-gradient(500px 200px at 100% 0,rgba(139,23,19,.06),transparent 60%),
+    var(--paper-2);
+  box-shadow:0 30px 70px rgba(0,0,0,.55);
+  animation:modalIn .32s cubic-bezier(.2,.8,.25,1) both;
+  scrollbar-width:thin;scrollbar-color:rgba(139,23,19,.3) transparent;
+}
+.modal-card::-webkit-scrollbar{width:5px;}
+.modal-card::-webkit-scrollbar-thumb{background:rgba(139,23,19,.3);border-radius:5px;}
+.modal-head{
+  position:relative;padding:24px 28px 16px;border-bottom:1px solid var(--line);
+  background:linear-gradient(180deg,rgba(139,23,19,.04),transparent);
+}
+.modal-kicker{margin:0 0 5px;color:var(--red);font-size:8px;letter-spacing:.22em;font-weight:600;}
+.modal-title{margin:0;padding-right:32px;font-family:var(--serif);font-size:27px;line-height:1.38;letter-spacing:.04em;color:var(--ink);font-weight:700;}
+.modal-close{
+  position:absolute;right:17px;top:15px;width:29px;height:29px;border:1px solid rgba(111,82,48,.2);
+  background:transparent;color:var(--muted);font-size:18px;line-height:1;border-radius:50%;
+}
+.modal-close:hover{color:var(--red);border-color:rgba(139,23,19,.32);}
+.modal-body{padding:19px 28px 5px;color:var(--ink-soft);font-size:13px;line-height:1.9;}
+.modal-body p{margin:0 0 12px;}
+.modal-body .lead{color:var(--ink);font-size:14px;line-height:1.9;}
+.modal-body .small{font-size:9px;color:var(--faint);line-height:1.7;letter-spacing:.02em;}
+.modal-body .source-line{margin-top:14px;padding-top:11px;border-top:1px dashed var(--line);font-size:8px;color:var(--faint);line-height:1.7;}
+.modal-body .quote{
+  margin:4px 0 14px;padding:14px 16px;border-left:2px solid var(--gold);
+  background:rgba(200,163,91,.07);font-family:var(--serif);font-size:15px;line-height:1.9;color:var(--ink);
+  letter-spacing:.025em;
+}
+.modal-body .quote mark{background:none;color:var(--red);}
+.modal-body .section-label{
+  display:flex;align-items:center;gap:7px;margin:3px 0 10px;color:var(--red);
+  font-size:8px;font-weight:600;letter-spacing:.16em;
+}
+.modal-body .section-label::before{content:"";width:18px;height:1px;background:var(--red);}
+.choice-list{display:flex;flex-direction:column;gap:8px;margin:14px 0 6px;}
+.choice-btn{
+  display:grid;grid-template-columns:34px 1fr;gap:11px;align-items:start;width:100%;
+  padding:12px 13px;border:1px solid var(--line);background:rgba(255,255,255,.38);
+  text-align:left;transition:border-color .2s,background .2s,transform .2s;
+}
+.choice-btn:hover{border-color:rgba(139,23,19,.48);background:#fffaf0;transform:translateX(2px);}
+.choice-letter{
+  width:30px;height:30px;border-radius:50%;border:1px solid rgba(139,23,19,.45);
+  display:grid;place-items:center;font-family:var(--serif);font-size:13px;color:var(--red);
+}
+.choice-copy strong{display:block;font-family:var(--serif);font-size:14px;line-height:1.5;color:var(--ink);font-weight:600;}
+.choice-copy small{display:block;margin-top:2px;color:var(--muted);font-size:10px;line-height:1.65;}
+.choice-btn[disabled]{cursor:default;opacity:.6;}
+.result-banner{padding:12px 14px;margin:0 0 15px;border-left:3px solid var(--gold);background:rgba(200,163,91,.08);}
+.result-banner.correct{border-left-color:#557448;background:rgba(85,116,72,.08);}
+.result-banner.wrong{border-left-color:var(--red);background:rgba(139,23,19,.055);}
+.result-banner strong{display:block;font-family:var(--serif);font-size:16px;color:var(--ink);}
+.result-banner span{display:block;margin-top:2px;color:var(--muted);font-size:10px;}
+.result-banner.correct strong{color:#3e5a34;}
+.result-banner.wrong strong{color:var(--red);}
+.cost-row{display:flex;flex-wrap:wrap;gap:5px;margin:12px 0 2px;}
+.cost-chip{padding:2px 7px;border:1px solid rgba(139,23,19,.17);background:rgba(139,23,19,.055);color:#8b1713;font-size:9px;font-variant-numeric:tabular-nums;}
+.cost-chip.gain{border-color:rgba(85,116,72,.22);background:rgba(85,116,72,.08);color:#49643d;}
+.modal-actions{
+  display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap;
+  padding:14px 28px 20px;
+}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:0 17px;
+  border:1px solid transparent;border-radius:2px;font-size:11px;letter-spacing:.06em;
+  transition:background .2s,border-color .2s,color .2s,transform .2s;
+}
+.btn:hover{transform:translateY(-1px);}
+.btn-primary{background:linear-gradient(135deg,#8b1713,#620a08);color:#f8ead0;border-color:#6c0c09;box-shadow:0 7px 16px rgba(89,7,7,.16);}
+.btn-primary:hover{background:linear-gradient(135deg,#a02019,#720d09);}
+.btn-ghost{background:transparent;border-color:rgba(111,82,48,.3);color:var(--ink-soft);}
+.btn-ghost:hover{border-color:rgba(139,23,19,.4);color:var(--red);background:rgba(139,23,19,.03);}
+.btn-danger{background:#7d1a13;color:#fae6d6;border-color:#64100b;}
+.btn-danger:hover{background:#94251b;}
+.btn:disabled{opacity:.55;cursor:default;transform:none;}
+.wide .modal-card{width:min(780px,100%);}
+.ending-title{font-family:var(--serif);font-size:20px;color:var(--red);letter-spacing:.06em;margin-bottom:8px;}
+.ending-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;margin:14px 0;background:var(--line);border:1px solid var(--line);}
+.ending-stat{padding:11px 6px;background:var(--paper-2);text-align:center;}
+.ending-stat span{display:block;color:var(--faint);font-size:8px;letter-spacing:.1em;}
+.ending-stat strong{display:block;margin-top:2px;font-family:var(--serif);font-size:22px;color:var(--red);font-variant-numeric:tabular-nums;}
+.ending-stat small{font-size:8px;color:var(--faint);}
+.victory-star{width:46px;height:46px;margin:0 auto 10px;display:grid;place-items:center;border:1px solid rgba(200,163,91,.5);border-radius:50%;color:var(--gold);}
+.victory-star svg{width:24px;height:24px;fill:currentColor;}
+.spirit-box{padding:12px 14px;border-left:2px solid var(--gold);background:rgba(200,163,91,.06);font-size:11px;line-height:1.85;color:var(--ink-soft);}
+.spirit-box strong{color:var(--red);}
+.help-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:13px 0;}
+.help-box{padding:10px 11px;border:1px solid var(--line);background:rgba(255,255,255,.3);font-size:10px;line-height:1.7;color:var(--muted);}
+.help-box strong{display:block;margin-bottom:2px;color:var(--ink);font-size:11px;}
+.help-key{display:inline-block;min-width:18px;padding:0 4px;border:1px solid var(--line);background:#fff9ee;text-align:center;font-size:9px;color:var(--ink-soft);}
+.legend-list{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:11px 0;font-size:10px;color:var(--muted);}
+.legend-list span{display:flex;align-items:center;gap:6px;}
+.legend-dot{width:9px;height:9px;border-radius:50%;flex:0 0 auto;}
+.legend-dot.gold{background:var(--gold);box-shadow:0 0 8px rgba(200,163,91,.45);}
+.legend-dot.red{background:var(--red);}
+.legend-dot.paper{background:#f4e9d2;border:1px solid #b9975f;}
+.legend-dot.lock{background:transparent;border:1px solid var(--red);}
+.legend-dot.marsh{background:#5d684d;}
+.legend-dot.snow{background:#dbe2dd;}
+
+/* ---------- 动画 ---------- */
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+@keyframes modalIn{from{opacity:0;transform:translateY(-14px) scale(.985);}to{opacity:1;transform:none;}}
+@keyframes lowBlink{0%,100%{opacity:1;}50%{opacity:.42;}}
+@keyframes deltaFloat{0%{opacity:0;transform:translateY(5px);}15%{opacity:1;transform:translateY(0);}70%{opacity:1;}100%{opacity:0;transform:translateY(-8px);}}
+@keyframes currentDot{0%,100%{box-shadow:0 0 0 0 rgba(200,163,91,.3);}50%{box-shadow:0 0 0 5px rgba(200,163,91,0);}}
+@keyframes miniPulse{0%,100%{opacity:.62;}50%{opacity:1;}}
+@keyframes hazardPulse{0%,100%{opacity:.72;}50%{opacity:1;}}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ---------- 响应式 ---------- */
+@media (max-width:1120px){
+  .shell{grid-template-columns:1fr;max-width:900px;}
+  .sidebar{display:grid;grid-template-columns:1fr 1fr;align-items:start;}
+  .side-card.resources-card{grid-column:1/-1;}
+  .resource-list{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;}
+  .res-card{border:1px solid rgba(200,163,91,.09);padding:8px 7px;}
+  .side-actions{grid-column:1/-1;}
+  .source-note{grid-column:1/-1;}
+  .game-frame{height:min(68vh,680px);min-height:430px;}
+}
+@media (max-width:760px){
+  .topbar-inner{padding:10px 14px;gap:10px;}
+  .brand-mark{width:38px;height:38px;}
+  .brand-title{font-size:18px;letter-spacing:.1em;}
+  .brand-sub{display:none;}
+  .top-actions .btn-label{display:none;}
+  .top-btn{width:34px;padding:0;justify-content:center;}
+  .shell{padding:10px 10px 24px;gap:10px;}
+  .game-meta{font-size:8px;padding-bottom:7px;}
+  .game-meta .meta-right span:first-child{display:none;}
+  .game-frame{height:62vh;min-height:390px;}
+  .hud-top{left:7px;right:7px;top:7px;gap:5px;}
+  .hud-chip{padding:5px 7px;font-size:8px;max-width:55%;}
+  .hud-chip .sub{display:none;}
+  .hud-chip.objective{max-width:45%;}
+  .hazard-chip{top:44px;font-size:8px;}
+  .area-banner{top:75px;padding:7px 14px;}
+  .area-banner strong{font-size:16px;}
+  .game-toast{bottom:82px;font-size:9px;}
+  .canvas-help{display:none;}
+  .objective-bar{padding:9px 10px;margin-top:7px;gap:8px;}
+  .objective-main strong{font-size:12px;}
+  .objective-main span{font-size:8px;}
+  .objective-side .count{font-size:13px;}
+  .mini-progress i{width:10px;}
+  .sidebar{grid-template-columns:1fr;}
+  .side-card.resources-card{grid-column:auto;}
+  .resource-list{grid-template-columns:1fr;gap:1px;}
+  .side-actions{grid-column:auto;}
+  .source-note{grid-column:auto;}
+  .modal-layer{padding:8px;}
+  .modal-head{padding:20px 19px 13px;}
+  .modal-title{font-size:21px;}
+  .modal-body{padding:15px 19px 4px;font-size:12px;}
+  .modal-actions{padding:12px 19px 17px;}
+  .btn{min-height:36px;padding:0 13px;font-size:10px;}
+  .choice-btn{padding:10px;grid-template-columns:30px 1fr;gap:8px;}
+  .choice-letter{width:28px;height:28px;font-size:12px;}
+  .choice-copy strong{font-size:13px;}
+  .choice-copy small{font-size:9px;}
+  .ending-stats{grid-template-columns:1fr;}
+  .help-grid,.legend-list{grid-template-columns:1fr;}
+  .modal-card{max-height:calc(100% - 2px);}
+}
+@media (max-width:430px){
+  .top-actions{gap:5px;}
+  .brand-title{font-size:16px;}
+  .game-frame{height:58vh;min-height:350px;}
+  .hud-chip{font-size:7px;}
+  .hud-chip.objective{display:none;}
+  .objective-side{display:none;}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important;}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 32 32"><path d="M16 3.6l3.5 7.8 8.5 1-6.4 5.8 1.8 8.3L16 22.3 8.6 26.5l1.8-8.3L4 12.4l8.5-1z"/></svg>
+      </span>
+      <div class="brand-copy">
+        <h1 class="brand-title">重走长征路</h1>
+        <p class="brand-sub">俯视角长征沙盘 · 1934—1936</p>
+      </div>
+    </div>
+    <div class="top-actions">
+      <button class="top-btn" id="helpBtn" type="button" aria-label="操作说明">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.4 2.3c-.8.4-.9 1-.9 1.7M12 17h.01"/></svg>
+        <span class="btn-label">操作说明</span>
+      </button>
+      <button class="top-btn" id="soundlessInfo" type="button" aria-label="史料说明">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h11l3 3v13H5z"/><path d="M8 9h8M8 13h8M8 17h5"/></svg>
+        <span class="btn-label">史料说明</span>
+      </button>
+      <button class="top-btn danger" id="resetBtn" type="button" aria-label="重新开始推演">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9a8 8 0 1 1-.7 5.6M4 4v5h5"/></svg>
+        <span class="btn-label">重新开始</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main class="shell">
+  <section class="play-column">
+    <div class="game-meta">
+      <div><span class="dot"></span><span id="saveState">正在读取长征档案</span></div>
+      <div class="meta-right">
+        <span>WASD / 方向键移动</span>
+        <span>E 调查</span>
+        <span>闪光物件可收集</span>
+      </div>
+    </div>
+
+    <div class="game-frame" id="gameFrame">
+      <canvas id="gameCanvas" tabindex="0" aria-label="俯视角长征探索地图。使用WASD或方向键移动，走到红旗地标触发主线事件。"></canvas>
+
+      <div class="hud-top">
+        <div class="hud-chip">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6.1 7-12a7 7 0 1 0-14 0c0 5.9 7 12 7 12z"/><circle cx="12" cy="9" r="2.2"/></svg>
+          <span id="locationChip">长征路线</span>
+        </div>
+        <div class="hud-chip objective">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4M5 5h12l-2.2 4L17 13H5"/></svg>
+          <span id="objectiveChip">准备出发</span>
+        </div>
+      </div>
+
+      <div class="hazard-chip" id="hazardChip" hidden>危险地形 · 资源持续消耗</div>
+
+      <div class="area-banner" id="areaBanner" aria-live="polite">
+        <strong id="areaTitle">瑞金</strong>
+        <small id="areaSub">1934.10 · 中央红军长征出发地</small>
+      </div>
+
+      <div class="game-toast" id="gameToast" role="status" aria-live="polite"></div>
+      <div class="interact-prompt" id="interactPrompt"><kbd>E</kbd><span id="interactText">调查</span></div>
+
+      <div class="canvas-help">点击画面获取键盘焦点<br>支线会在探索途中随机出现</div>
+
+      <div class="touch-controls" aria-label="触摸方向键">
+        <button class="touch-up" data-dir="up" type="button" aria-label="向上">▲</button>
+        <button class="touch-left" data-dir="left" type="button" aria-label="向左">◀</button>
+        <button class="touch-down" data-dir="down" type="button" aria-label="向下">▼</button>
+        <button class="touch-right" data-dir="right" type="button" aria-label="向右">▶</button>
+      </div>
+      <button class="touch-interact" id="touchInteract" type="button">调查</button>
+
+      <div class="modal-layer" id="modalLayer" hidden>
+        <div class="modal-backdrop" id="modalBackdrop"></div>
+        <div class="modal-card" id="modalCard" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-describedby="modalBody">
+          <header class="modal-head">
+            <p class="modal-kicker" id="modalKicker">主线事件</p>
+            <h2 class="modal-title" id="modalTitle">标题</h2>
+            <button class="modal-close" id="modalClose" type="button" aria-label="关闭">×</button>
+          </header>
+          <div class="modal-body" id="modalBody"></div>
+          <div class="modal-actions" id="modalActions"></div>
+        </div>
+      </div>
+
+      <div class="boot-screen" id="bootScreen">
+        <div>
+          <strong>长征沙盘</strong>
+          <small>正在展开一九三四年的行军地图</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="objective-bar">
+      <div class="objective-main">
+        <span class="kicker">当前任务</span>
+        <strong id="taskTitle">从瑞金出发</strong>
+        <span id="taskSub">走到村口的红旗地标，触发主线事件。</span>
+      </div>
+      <div class="objective-side">
+        <div class="mini-progress" id="miniProgress" aria-hidden="true"></div>
+        <span class="count"><span id="progressCount">0</span> / 7</span>
+      </div>
+    </div>
+  </section>
+
+  <aside class="sidebar">
+    <section class="side-card resources-card" aria-labelledby="resTitle">
+      <div class="side-head">
+        <h2 id="resTitle">行军资源</h2>
+        <span>LIVE</span>
+      </div>
+      <div class="resource-list">
+        <div class="res-card" data-res="troops">
+          <span class="res-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17.2" cy="9" r="2.1"/><path d="M15.2 14.4c3.2 0 5.8 2.2 5.8 5"/></svg></span>
+          <div class="res-main">
+            <div class="res-top"><span>兵员</span><strong><span id="resTroops">86,000</span><small> 人</small></strong></div>
+            <div class="res-bar"><i id="barTroops"></i></div>
+          </div>
+          <span class="res-delta" id="deltaTroops"></span>
+        </div>
+        <div class="res-card" data-res="food">
+          <span class="res-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 21V8"/><path d="M12 12c-3.1 0-5.2-2.1-5.2-5.2C9.9 6.8 12 8.9 12 12zM12 12c3.1 0 5.2-2.1 5.2-5.2C14.1 6.8 12 8.9 12 12zM12 17c-2.3 0-4-1.7-4-4 2.3 0 4 1.7 4 4zM12 17c2.3 0 4-1.7 4-4-2.3 0-4 1.7-4 4z"/></svg></span>
+          <div class="res-main">
+            <div class="res-top"><span>粮食</span><strong><span id="resFood">100</span><small> 份</small></strong></div>
+            <div class="res-bar"><i id="barFood"></i></div>
+          </div>
+          <span class="res-delta" id="deltaFood"></span>
+        </div>
+        <div class="res-card" data-res="ammo">
+          <span class="res-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7.2 21V10.3L10 4l2.8 6.3V21z"/><path d="M14.2 21V11.2L16 7l1.8 4.2V21z"/><path d="M6 21h12"/></svg></span>
+          <div class="res-main">
+            <div class="res-top"><span>弹药</span><strong><span id="resAmmo">100</span><small> 发</small></strong></div>
+            <div class="res-bar"><i id="barAmmo"></i></div>
+          </div>
+          <span class="res-delta" id="deltaAmmo"></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="side-card" aria-labelledby="timelineTitle">
+      <div class="side-head">
+        <h2 id="timelineTitle">长征进度</h2>
+        <span>按史实顺序解锁</span>
+      </div>
+      <div class="timeline" id="timeline"></div>
+    </section>
+
+    <section class="side-card" aria-labelledby="bagTitle">
+      <div class="bag-head">
+        <h2 id="bagTitle">史料背包</h2>
+        <span class="bag-count" id="bagCount">0 / 14</span>
+      </div>
+      <div class="bag-list" id="bagList"></div>
+      <div class="side-actions">
+        <button class="side-btn primary" id="reviewBtn" type="button" hidden>查看会师复盘</button>
+        <button class="side-btn" id="sideHelpBtn" type="button">操作说明</button>
+        <button class="side-btn danger" id="sideResetBtn" type="button">重新开始</button>
+      </div>
+      <p class="storage-note" id="storageNote">进度会自动保存在本机。</p>
+    </section>
+
+    <section class="side-card">
+      <p class="source-note"><strong>史实依据</strong><br>重大历史事件依据《中国共产党简史》、中央党史和文献研究院公开资料。日记与纸条为据公开长征日记、亲历者回忆综合整理的教学改写文本，非逐字原文；支线为据真实军民互助、战友情事迹综合改写。</p>
+    </section>
+  </aside>
+</main>
+
+<script>
+/* =========================================================
+   一、基础数据
+   ========================================================= */
+(function () {
+  'use strict';
+
+  const SAVE_KEY = 'changzheng-sandbox-v1';
+  const INITIAL_RES = { troops: 86000, food: 100, ammo: 100 };
+  const MAX_RES = { troops: 200000, food: 100, ammo: 100 };
+  const TILE = 32;
+  const COLS = 176;
+  const ROWS = 38;
+  const WORLD_W = COLS * TILE;
+  const WORLD_H = ROWS * TILE;
+  const TYPE = { GRASS: 0, FOREST: 1, MOUNTAIN: 2, PATH: 3, WATER: 4, BRIDGE: 5, MARSH: 6, SNOW: 7 };
+  const BLOCKED_TYPES = new Set([TYPE.FOREST, TYPE.MOUNTAIN, TYPE.WATER]);
+  const HAZARD_TYPES = new Set([TYPE.MARSH, TYPE.SNOW]);
+  const fmt = new Intl.NumberFormat('zh-CN');
+
+  const ROUTE = [
+    [480, 960], [740, 920], [1020, 860], [1280, 850], [1550, 800], [1800, 860],
+    [2050, 900], [2360, 870], [2600, 800], [2860, 720], [3120, 620], [3320, 500],
+    [3520, 440], [3800, 470], [4050, 510], [4280, 520], [4550, 450], [4800, 340], [5120, 250]
+  ];
+
+  const GATES = [
+    { after: 0, x: 870, y: 900, half: 138 },
+    { after: 1, x: 1650, y: 826, half: 138 },
+    { after: 2, x: 2420, y: 846, half: 138 },
+    { after: 3, x: 3200, y: 584, half: 138 },
+    { after: 4, x: 3900, y: 487, half: 138 },
+    { after: 5, x: 4650, y: 410, half: 138 }
+  ];
+
+  const STATIONS = [
+    {
+      id: 0, key: 'ruijin', name: '瑞金', title: '瑞金出发', area: '江西 · 瑞金', date: '1934.10',
+      x: 480, y: 960, spawn: { x: 480, y: 1060 },
+      intro: '中央红军自瑞金出发，踏上战略转移之路。',
+      main: {
+        story: '1934年10月，中央红军自瑞金出发，共约8.6万人，开始长征，面临国民党军第五次“围剿”后的围追堵截。',
+        question: '红军主力应当如何行动？',
+        options: [
+          { letter: 'A', title: '原地固守瑞金', desc: '依托根据地，固守待变。', correct: false, cost: { troops: -6600, food: -18, ammo: -10 } },
+          { letter: 'B', title: '按计划突围转移', desc: '保存主力，按既定路线向西突围。', correct: true, cost: { troops: -600, food: -5, ammo: -8 } },
+          { letter: 'C', title: '分散小队单独突围', desc: '化整为零，多路寻找突破口。', correct: false, cost: { troops: -4600, food: -8, ammo: -6 } }
+        ],
+        fact: '由于第五次反“围剿”失利，中央红军被迫实行战略转移。固守瑞金难以长期坚持，分散突围则容易被敌军分割包围；按计划突围，保存了党中央和红军主力，踏上长征之路。'
+      },
+      collectibles: [
+        { id: 'ruijin-note-1', kind: '纸条', title: '离开苏区', ox: -145, oy: 24, text: '“我们离开苏区，不是放弃土地，是为了活下去，将来再回来。老乡们给我们塞的红薯，我们记在心里。”', source: '据苏区红军战士回忆材料综合整理，教学改写。' },
+        { id: 'ruijin-note-2', kind: '日记节选', title: '乡亲送行', ox: 142, oy: -34, text: '“今日出发，乡亲沿路相送，有的抹眼泪，有的把鸡蛋硬塞到我们包里。我们答应他们，一定会回来。”', source: '据长征出发前后红军日记、回忆材料综合整理，教学改写。' }
+      ],
+      side: {
+        title: '村口的红薯', theme: '军民鱼水情', ox: 136, oy: 104,
+        story: '你在村口遇见一位苏区大娘。她把一袋红薯悄悄塞给红军，嘱咐你们小心敌军，不敢久留。',
+        source: '据中央苏区群众节衣缩食支援红军的史料综合改写。',
+        help: '收下红薯，向大娘道谢。',
+        result: '你收下红薯，向大娘郑重道谢。群众把仅有的口粮交给红军，这份信任被战士们记在心里。',
+        reward: { food: 5 }, rewardText: '粮食 +5'
+      }
+    },
+    {
+      id: 1, key: 'xiangjiang', name: '湘江', title: '湘江战役', area: '广西 · 湘江', date: '1934.11',
+      x: 1280, y: 850, spawn: { x: 1280, y: 970 },
+      intro: '湘江横亘在前，国民党军多路合围。',
+      main: {
+        story: '湘江是国民党军重兵设防的第四道封锁线，多路敌军合围，形势极度凶险。此战之后，红军由8.6万余人锐减至3万余人，是长征最惨烈的一战。',
+        question: '红军应当怎样突破湘江？',
+        options: [
+          { letter: 'A', title: '携带全部辎重缓慢行军', desc: '保全全部物资，稳步向湘江推进。', correct: false, cost: { troops: -58000, food: -35, ammo: -18 } },
+          { letter: 'B', title: '原地等待援军', desc: '停止前进，等待友军接应。', correct: false, cost: { troops: -59800, food: -20, ammo: -10 } },
+          { letter: 'C', title: '集中兵力强渡湘江突破封锁', desc: '抢占渡口，集中力量掩护主力过江。', correct: true, cost: { troops: -53000, food: -10, ammo: -20 } }
+        ],
+        fact: '湘江战役中，中央红军经过浴血奋战渡过湘江，突破了国民党军第四道封锁线，但付出了极其惨重的代价，由出发时的8.6万余人锐减至3万余人。辎重拖累行军速度，原地等待只会陷入合围。'
+      },
+      collectibles: [
+        { id: 'xiangjiang-note-1', kind: '战地纸条', title: '伤员绝笔', ox: 104, oy: 76, text: '“战友，我走不动了，不要管我，跟上大部队，一定要冲过去。”', source: '据湘江战役亲历者回忆综合整理，教学改写。' },
+        { id: 'xiangjiang-note-2', kind: '日记节选', title: '染红的江水', ox: 154, oy: -38, text: '“江水都被染红，很多战友倒下。我们互相拉着，谁也不愿丢下谁。”', source: '据湘江战役亲历者回忆与公开长征日记综合整理，教学改写。' }
+      ],
+      side: {
+        title: '不丢下战友', theme: '战友情', ox: 148, oy: 104,
+        story: '突围途中，一名战士腿部负伤。战友们不愿丢下他，轮流搀扶，帮他背枪，一起追赶大部队。',
+        source: '据湘江战役中红军互相救护、绝不轻易抛弃战友的史料综合改写。',
+        help: '轮流搀扶伤员，一起突围。',
+        result: '你们轮流搀扶伤员，终于追上队伍。几名掉队的战士也循着队伍方向赶了上来。',
+        reward: { troops: 120 }, rewardText: '兵员 +120（收拢掉队战士）'
+      }
+    },
+    {
+      id: 2, key: 'zunyi', name: '遵义', title: '遵义会议', area: '贵州 · 遵义', date: '1935.01',
+      x: 2050, y: 900, spawn: { x: 2050, y: 1010 },
+      intro: '在极端危急的关头，红军需要重新校准军事指挥。',
+      main: {
+        story: '1935年1月，遵义会议召开，集中纠正“左”倾错误军事指挥，实际确立了毛泽东同志在党中央和红军的领导地位，是党的历史上一个生死攸关的转折点。',
+        question: '红军应当怎样面对此前的失败？',
+        options: [
+          { letter: 'A', title: '就地长期驻守休整', desc: '停下脚步，在遵义长期休整。', correct: false, cost: { troops: -2400, food: -45, ammo: -5 } },
+          { letter: 'B', title: '总结教训，调整军事指挥策略', desc: '正视失利原因，恢复机动灵活的战法。', correct: true, cost: { troops: -400, food: -2, ammo: -4 } },
+          { letter: 'C', title: '继续沿用之前的战术方案', desc: '维持原有部署，不做调整。', correct: false, cost: { troops: -5400, food: -8, ammo: -30 } }
+        ],
+        fact: '遵义会议集中纠正了“左”倾教条主义在军事指挥上的错误，实际上确立了毛泽东同志在党中央和红军的领导地位。此前错误的军事指挥，是第五次反“围剿”失利和长征初期严重损失的重要原因。'
+      },
+      collectibles: [
+        { id: 'zunyi-note-1', kind: '日记节选', title: '心里亮堂了', ox: -146, oy: 62, text: '“会议开完，大家心里亮堂了，之前憋在心里的疑惑，终于有了答案。”', source: '据遵义会议前后红军干部、战士回忆综合整理，教学改写。' },
+        { id: 'zunyi-note-2', kind: '纸条', title: '遵义老乡', ox: 148, oy: 42, text: '“在遵义，老乡愿意卖给我们粮食，给我们讲周边道路，这里的老百姓信任我们。”', source: '据遵义群众支援红军的史料综合整理，教学改写。' }
+      ],
+      side: {
+        title: '老乡带路', theme: '军民鱼水情', ox: 128, oy: -106,
+        story: '遵义城郊的一位老乡主动前来，愿意带红军走小路，绕开敌军据点。',
+        source: '据遵义群众为红军提供情报、担任向导的史料综合改写。',
+        help: '请老乡带路，避开敌军哨卡。',
+        result: '老乡带着队伍穿过山间小路，避开了敌军据点。后续行军节省了弹药消耗。',
+        reward: { ammoGuard: 8 }, rewardText: '后续弹药消耗 -8'
+      }
+    },
+    {
+      id: 3, key: 'luding', name: '泸定桥', title: '飞夺泸定桥', area: '四川 · 泸定桥', date: '1935.05',
+      x: 2860, y: 720, spawn: { x: 2860, y: 840 },
+      intro: '大渡河挡住北上道路，泸定桥是必须夺下的通道。',
+      main: {
+        story: '红军需要夺取泸定桥横渡大渡河。战士们一昼夜奔袭240里，冒着炮火抢占铁索桥。',
+        question: '应当如何夺取泸定桥？',
+        options: [
+          { letter: 'A', title: '绕远路缓慢行军', desc: '避开正面，沿远路寻找渡口。', correct: false, cost: { troops: -4500, food: -35, ammo: -5 } },
+          { letter: 'B', title: '连夜急行军奔袭夺桥', desc: '抢在敌军增援前赶到泸定桥。', correct: true, cost: { troops: -1500, food: -8, ammo: -6 } },
+          { letter: 'C', title: '原地等待大部队与重武器', desc: '等主力会合后再发起夺桥。', correct: false, cost: { troops: -6500, food: -10, ammo: -12 } }
+        ],
+        fact: '1935年5月，红军先头部队一昼夜奔袭240里，冒雨赶到泸定桥。22名勇士冒着枪林弹雨攀着铁索夺桥，为红军打开了北上通道。敌军援军正在赶来，拖延会失去渡河机会。'
+      },
+      collectibles: [
+        { id: 'luding-note-1', kind: '突击队员手记', title: '铁索很烫', ox: -138, oy: 58, text: '“铁索很烫，子弹在耳边飞，我们没有退路，只能往前冲。”', source: '据飞夺泸定桥亲历者回忆及公开党史资料综合整理，教学改写。' },
+        { id: 'luding-note-2', kind: '日记节选', title: '一昼夜二百四十里', ox: 146, oy: -48, text: '“一夜跑二百四十里，鞋子磨破，脚上全是血泡，不敢停下。”', source: '据飞夺泸定桥亲历者回忆及公开党史资料综合整理，教学改写。' }
+      ],
+      side: {
+        title: '一条绑腿', theme: '战友情', ox: -132, oy: -112,
+        story: '奔袭路上，一名战士双脚磨烂。战友撕下自己的绑腿给他包扎，又轮流帮他背枪。',
+        source: '据长征途中红军战士互助前行、共度艰险的回忆综合改写。',
+        help: '分出绑腿，帮战友包扎。',
+        result: '你们给战友包扎好双脚，分担了他的行装。队伍没有停下，继续向泸定桥奔去。',
+        reward: { food: 4 }, rewardText: '粮食 +4'
+      }
+    },
+    {
+      id: 4, key: 'jiajinshan', name: '夹金山', title: '翻越夹金山', area: '四川 · 夹金山', date: '1935.06',
+      x: 3520, y: 440, spawn: { x: 3520, y: 560 },
+      intro: '海拔四千余米的风雪高山，横亘在北上路上。',
+      main: {
+        story: '夹金山海拔四千余米，高寒缺氧、风雪刺骨，大量战士缺少御寒棉衣。',
+        question: '红军应当怎样翻越夹金山？',
+        options: [
+          { letter: 'A', title: '轻装、分批翻越雪山', desc: '减少负重，互相搀扶，尽快通过高寒地带。', correct: true, cost: { troops: -12000, food: -12, ammo: -2 } },
+          { letter: 'B', title: '携带全部物资缓慢爬山', desc: '不愿丢弃物资，队伍负重前行。', correct: false, cost: { troops: -17000, food: -35, ammo: -5 } },
+          { letter: 'C', title: '就地等待气温回暖', desc: '停止翻越，在山下等待天气转好。', correct: false, cost: { troops: -16000, food: -60, ammo: -3 } }
+        ],
+        fact: '夹金山空气稀薄、天气多变。红军轻装、分批翻越，尽量减少负重，但仍因高寒缺氧出现非战斗减员。追兵持续逼近，红军没有就地等待的条件。'
+      },
+      collectibles: [
+        { id: 'jiajinshan-note-1', kind: '日记节选', title: '风雪如刀', ox: -106, oy: 92, text: '“风雪像刀子，越往上越冷，呼吸都疼。大家互相搀扶，喊着口号往前走。”', source: '据红军翻越夹金山的回忆材料综合整理，教学改写。' },
+        { id: 'jiajinshan-note-2', kind: '纸条', title: '棉衣给伤员', ox: 112, oy: -70, text: '“我这件棉衣分给伤员，我年轻，扛得住冻。”', source: '据红军过雪山时官兵互助的回忆材料综合整理，教学改写。' }
+      ],
+      side: {
+        title: '最后的毯子', theme: '战友情', ox: 146, oy: 78,
+        story: '风雪中，一名战士把仅有的御寒毯子让给冻伤的年轻伤员，自己咬牙继续前行。',
+        source: '据红军过雪山时舍己为人、互相救护的史料综合改写。',
+        help: '把毯子让给伤员，扶他前进。',
+        result: '伤员裹紧毯子，队伍互相搀扶翻过雪坡。此后在雪山区域，队伍的御寒消耗有所降低。',
+        reward: { snowResist: true }, rewardText: '雪山消耗速度降低'
+      }
+    },
+    {
+      id: 5, key: 'caodi', name: '松潘草地', title: '松潘草地', area: '四川 · 松潘草地', date: '1935.08',
+      x: 4280, y: 520, spawn: { x: 4280, y: 640 },
+      intro: '泥潭遍布、补给断绝，草地是长征路上最艰苦的行军之一。',
+      main: {
+        story: '松潘沼泽草地泥潭遍布、补给断绝，很多战士牺牲于饥饿、沼泽与严寒。',
+        question: '红军应当怎样穿越草地？',
+        options: [
+          { letter: 'A', title: '放开粮食供给', desc: '让战士们先吃饱，再继续行军。', correct: false, cost: { troops: -16500, food: -70, ammo: -2 } },
+          { letter: 'B', title: '节约粮食、有序编组行军', desc: '统一分配口粮，互相搀扶走出沼泽。', correct: true, cost: { troops: -11500, food: -16, ammo: -2 } },
+          { letter: 'C', title: '分散自行寻找出路', desc: '化整为零，各自寻找离开草地的路。', correct: false, cost: { troops: -16500, food: -20, ammo: -8 } }
+        ],
+        fact: '松潘草地方圆数百里，沼泽遍布、气候恶劣、粮食奇缺。红军节约粮食、严密编组、相互扶持，付出巨大牺牲后走出草地。分散行动容易迷路、陷入泥沼，粮食是穿越草地最核心的保障。'
+      },
+      collectibles: [
+        { id: 'caodi-note-1', kind: '日记节选', title: '看不到头的草地', ox: -142, oy: 64, text: '“草地看不到头，泥潭随时吞人。干粮吃完，很多同志吃草根树皮。”', source: '据红军过草地亲历者回忆与公开日记材料综合整理，教学改写。' },
+        { id: 'caodi-note-2', kind: '纸条', title: '继续往前走', ox: 138, oy: -44, text: '“如果我陷下去，不要拉我，你们继续往前走。”', source: '据红军过草地时的回忆材料综合整理，教学改写。' }
+      ],
+      side: {
+        title: '草原上的青稞', theme: '军民鱼水情', ox: -118, oy: 112,
+        story: '一位藏族牧民远远看见红军，悄悄送来少量青稞，又指给你们一条相对安全的路径。',
+        source: '据红军长征途中得到各族群众帮助的史料综合改写。',
+        help: '收下青稞，按照牧民指的方向前进。',
+        result: '你们收下青稞，记下安全路径。草地深处的队伍多了一点继续前进的粮食。',
+        reward: { food: 7 }, rewardText: '粮食 +7'
+      }
+    },
+    {
+      id: 6, key: 'huining', name: '会宁', title: '会宁会师', area: '甘肃 · 会宁', date: '1936.10',
+      x: 5120, y: 250, spawn: { x: 5120, y: 360 },
+      intro: '三大主力红军胜利会师，二万五千里征途迎来胜利终点。',
+      main: null,
+      collectibles: [
+        { id: 'huining-note-1', kind: '日记节选', title: '看见兄弟部队了', ox: -124, oy: 58, text: '“看见兄弟部队了！我们走过来了。一路牺牲那么多同志，我们替他们走到这里。”', source: '据红军会师时亲历者回忆材料综合整理，教学改写。' },
+        { id: 'huining-note-2', kind: '纸条', title: '革命的路还没走完', ox: 132, oy: 36, text: '“长征结束了，但革命的路还没有走完。”', source: '据红军会师前后回忆材料综合整理，教学改写。' }
+      ],
+      side: {
+        title: '会师那天', theme: '战友情', ox: 104, oy: 106,
+        story: '不同方面军的战士在会宁相遇。他们交换干粮，互相讲述一路走来的艰险，笑声和泪水混在一起。',
+        source: '据红军三大主力会师时指战员回忆材料综合改写。',
+        help: '和兄弟部队的战士交换干粮。',
+        result: '你们交换了干粮，也交换了一路的故事。长征结束了，但新的征程才刚刚开始。',
+        reward: {}, rewardText: '一段无法用数字衡量的记忆'
+      }
+    }
+  ];
+
+  const ALL_ITEMS = STATIONS.flatMap((station) => station.collectibles.map((item) => ({
+    ...item,
+    stationId: station.id,
+    stationName: station.name
+  })));
+  const TOTAL_ITEMS = ALL_ITEMS.length;
+
+  // 主选项正确答案分布：B / C / B / B / A / B（不再固定为 A）
+  // 使用时只读取 option.correct，UI 不会提前暴露正确项。
+
+  /* =====================================================
+     二、DOM、运行状态与工具
+     ===================================================== */
+  const $ = (id) => document.getElementById(id);
+  const canvas = $('gameCanvas');
+  const ctx = canvas.getContext('2d');
+  const worldCanvas = document.createElement('canvas');
+  const wctx = worldCanvas.getContext('2d');
+
+  let state = null;
+
+  const game = {
+    paused: true,
+    failed: false,
+    modalOpen: false,
+    storageOK: true,
+    keys: new Set(),
+    touchDirs: new Set(),
+    camera: { x: 0, y: 0 },
+    view: { w: 960, h: 600 },
+    dpr: 1,
+    moving: false,
+    walkTime: 0,
+    lastArea: null,
+    mainZone: null,
+    sideZone: null,
+    victoryZone: false,
+    lastGateHint: 0,
+    lastToast: 0,
+    toastTimer: 0,
+    interactionCooldown: 0,
+    floats: [],
+    snow: [],
+    time: 0,
+    lastFrame: 0,
+    displayed: { ...INITIAL_RES },
+    pendingFail: '',
+    saveDirty: false,
+    saveTimer: 0,
+    modalAfterClose: null
+  };
+
+  const TYPES = new Uint8Array(COLS * ROWS);
+  const SOLID = new Uint8Array(COLS * ROWS);
+  const ROUTE_DIST = new Float32Array(COLS * ROWS);
+  const TILE_INDEX = (tx, ty) => ty * COLS + tx;
+  const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
+  const dist2 = (x1, y1, x2, y2) => Math.hypot(x2 - x1, y2 - y1);
+
+  function hash2(x, y) {
+    let h = Math.imul(x + 374761393, 668265263) ^ Math.imul(y + 1274126177, 2246822519);
+    h = Math.imul(h ^ (h >>> 13), 1274126177);
+    return ((h ^ (h >>> 16)) >>> 0) / 4294967295;
+  }
+
+  function pointSegmentDistance(px, py, x1, y1, x2, y2) {
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    const len = dx * dx + dy * dy;
+    const t = len ? clamp(((px - x1) * dx + (py - y1) * dy) / len, 0, 1) : 0;
+    const x = x1 + dx * t;
+    const y = y1 + dy * t;
+    return { dist: Math.hypot(px - x, py - y), t, x, y, angle: Math.atan2(dy, dx) };
+  }
+
+  function nearestRoute(px, py) {
+    let best = { dist: Infinity, t: 0, x: 0, y: 0, angle: 0 };
+    for (let i = 0; i < ROUTE.length - 1; i += 1) {
+      const a = ROUTE[i];
+      const b = ROUTE[i + 1];
+      const res = pointSegmentDistance(px, py, a[0], a[1], b[0], b[1]);
+      if (res.dist < best.dist) best = res;
+    }
+    return best;
+  }
+
+  function tileTypeAtWorld(x, y) {
+    const tx = Math.floor(x / TILE);
+    const ty = Math.floor(y / TILE);
+    if (tx < 0 || ty < 0 || tx >= COLS || ty >= ROWS) return TYPE.MOUNTAIN;
+    return TYPES[TILE_INDEX(tx, ty)];
+  }
+
+  function isHazardTileAtWorld(x, y) {
+    return HAZARD_TYPES.has(tileTypeAtWorld(x, y));
+  }
+
+  /* =====================================================
+     三、世界生成
+     ===================================================== */
+  function buildWorld() {
+    // 基础地貌：山林为主，路线和站点周边开辟可通行区域
+    for (let ty = 0; ty < ROWS; ty += 1) {
+      for (let tx = 0; tx < COLS; tx += 1) {
+        const i = TILE_INDEX(tx, ty);
+        const cx = tx * TILE + TILE / 2;
+        const cy = ty * TILE + TILE / 2;
+        const n = hash2(tx, ty);
+        const north = ty < 4 || ty > ROWS - 5;
+        TYPES[i] = north || n > 0.55 ? TYPE.MOUNTAIN : TYPE.FOREST;
+        const near = nearestRoute(cx, cy);
+        ROUTE_DIST[i] = near.dist;
+      }
+    }
+
+    // 沿真实路线方向开辟山路
+    for (let ty = 0; ty < ROWS; ty += 1) {
+      for (let tx = 0; tx < COLS; tx += 1) {
+        const i = TILE_INDEX(tx, ty);
+        const d = ROUTE_DIST[i];
+        if (d < 110) { TYPES[i] = TYPE.GRASS; }
+        if (d < 47) { TYPES[i] = TYPE.PATH; }
+      }
+    }
+
+    // 每站外围形成可探索空地
+    STATIONS.forEach((station) => {
+      const r = 248;
+      const minX = Math.max(0, Math.floor((station.x - r) / TILE));
+      const maxX = Math.min(COLS - 1, Math.ceil((station.x + r) / TILE));
+      const minY = Math.max(0, Math.floor((station.y - r) / TILE));
+      const maxY = Math.min(ROWS - 1, Math.ceil((station.y + r) / TILE));
+      for (let ty = minY; ty <= maxY; ty += 1) {
+        for (let tx = minX; tx <= maxX; tx += 1) {
+          const cx = tx * TILE + TILE / 2;
+          const cy = ty * TILE + TILE / 2;
+          if (dist2(cx, cy, station.x, station.y) < r) {
+            const i = TILE_INDEX(tx, ty);
+            if (TYPES[i] === TYPE.FOREST || TYPES[i] === TYPE.MOUNTAIN) TYPES[i] = TYPE.GRASS;
+          }
+        }
+      }
+    });
+
+    // 湘江：在第二站西侧形成南北向河道，路线经过处架桥
+    for (let ty = 0; ty < ROWS; ty += 1) {
+      for (let tx = 30; tx <= 43; tx += 1) {
+        const cx = tx * TILE + TILE / 2;
+        const cy = ty * TILE + TILE / 2;
+        const riverX = 1160 + Math.sin(cy * 0.011) * 42;
+        if (Math.abs(cx - riverX) < 48) {
+          const i = TILE_INDEX(tx, ty);
+          TYPES[i] = TYPE.WATER;
+        }
+      }
+    }
+
+    // 泸定桥附近的大渡河
+    for (let ty = 0; ty < ROWS; ty += 1) {
+      for (let tx = 87; tx <= 101; tx += 1) {
+        const cx = tx * TILE + TILE / 2;
+        const cy = ty * TILE + TILE / 2;
+        const riverX = 2965 + Math.sin(cy * 0.009 + 1.2) * 34;
+        if (Math.abs(cx - riverX) < 43) {
+          const i = TILE_INDEX(tx, ty);
+          TYPES[i] = TYPE.WATER;
+        }
+      }
+    }
+
+    // 路线跨河处形成桥面
+    for (let ty = 0; ty < ROWS; ty += 1) {
+      for (let tx = 0; tx < COLS; tx += 1) {
+        const i = TILE_INDEX(tx, ty);
+        if (TYPES[i] !== TYPE.WATER) continue;
+        const cx = tx * TILE + TILE / 2;
+        const cy = ty * TILE + TILE / 2;
+        const near = nearestRoute(cx, cy);
+        if (near.dist < 54 && ((cx > 1090 && cx < 1240) || (cx > 2880 && cx < 3060))) {
+          TYPES[i] = TYPE.BRIDGE;
+        }
+      }
+    }
+
+    // 夹金山雪线：主路安全，离开主路会进入持续消耗的雪地
+    STATIONS[4] && (() => {
+      const st = STATIONS[4];
+      for (let ty = 0; ty < ROWS; ty += 1) {
+        for (let tx = 0; tx < COLS; tx += 1) {
+          const cx = tx * TILE + TILE / 2;
+          const cy = ty * TILE + TILE / 2;
+          const i = TILE_INDEX(tx, ty);
+          if (cx < 3220 || cx > 3860) continue;
+          if (dist2(cx, cy, st.x, st.y) < 330 || ROUTE_DIST[i] < 170) {
+            if (ROUTE_DIST[i] < 46) TYPES[i] = TYPE.PATH;
+            else if (TYPES[i] !== TYPE.WATER) TYPES[i] = TYPE.SNOW;
+          }
+        }
+      }
+    })();
+
+    // 松潘草地：泥沼和雾，危险但可通行
+    STATIONS[5] && (() => {
+      const st = STATIONS[5];
+      for (let ty = 0; ty < ROWS; ty += 1) {
+        for (let tx = 0; tx < COLS; tx += 1) {
+          const cx = tx * TILE + TILE / 2;
+          const cy = ty * TILE + TILE / 2;
+          const i = TILE_INDEX(tx, ty);
+          if (cx < 3940 || cx > 4620) continue;
+          if (dist2(cx, cy, st.x, st.y) < 340 || ROUTE_DIST[i] < 180) {
+            if (ROUTE_DIST[i] < 46) TYPES[i] = TYPE.PATH;
+            else if (TYPES[i] !== TYPE.WATER) TYPES[i] = TYPE.MARSH;
+          }
+        }
+      }
+    })();
+
+    // 每站中心保留安全落脚点
+    STATIONS.forEach((st) => {
+      for (let ty = 0; ty < ROWS; ty += 1) {
+        for (let tx = 0; tx < COLS; tx += 1) {
+          const cx = tx * TILE + TILE / 2;
+          const cy = ty * TILE + TILE / 2;
+          if (dist2(cx, cy, st.x, st.y) < 58) TYPES[TILE_INDEX(tx, ty)] = TYPE.PATH;
+        }
+      }
+    });
+
+    // 保证收集品、支线、主地标所在格可达
+    const forceWalkable = (x, y, fallback) => {
+      const tx = Math.floor(x / TILE);
+      const ty = Math.floor(y / TILE);
+      if (tx < 0 || ty < 0 || tx >= COLS || ty >= ROWS) return;
+      const i = TILE_INDEX(tx, ty);
+      if (BLOCKED_TYPES.has(TYPES[i])) TYPES[i] = fallback;
+    };
+    STATIONS.forEach((st) => {
+      const fallback = st.id === 4 ? TYPE.SNOW : st.id === 5 ? TYPE.MARSH : TYPE.GRASS;
+      forceWalkable(st.x, st.y, TYPE.PATH);
+      st.collectibles.forEach((item) => forceWalkable(st.x + item.ox, st.y + item.oy, fallback));
+      forceWalkable(st.x + st.side.ox, st.y + st.side.oy, fallback);
+      forceWalkable(st.spawn.x, st.spawn.y, TYPE.PATH);
+    });
+
+    // 生成碰撞层
+    for (let i = 0; i < TYPES.length; i += 1) {
+      SOLID[i] = BLOCKED_TYPES.has(TYPES[i]) ? 1 : 0;
+    }
+
+    // 计算封锁线的朝向
+    GATES.forEach((gate) => {
+      const near = nearestRoute(gate.x, gate.y);
+      gate.angle = near.angle + Math.PI / 2;
+      gate.dx = Math.cos(gate.angle) * gate.half;
+      gate.dy = Math.sin(gate.angle) * gate.half;
+    });
+
+    worldCanvas.width = WORLD_W;
+    worldCanvas.height = WORLD_H;
+    renderWorld();
+  }
+
+  function drawTree(c, x, y, scale, dark) {
+    c.fillStyle = dark ? '#2e3f2c' : '#3b5137';
+    c.beginPath();
+    c.moveTo(x - 8 * scale, y + 1);
+    c.lineTo(x, y - 17 * scale);
+    c.lineTo(x + 8 * scale, y + 1);
+    c.closePath();
+    c.fill();
+    c.fillStyle = dark ? '#39482f' : '#4b5f3d';
+    c.beginPath();
+    c.moveTo(x - 10 * scale, y + 9);
+    c.lineTo(x, y - 8 * scale);
+    c.lineTo(x + 10 * scale, y + 9);
+    c.closePath();
+    c.fill();
+    c.fillStyle = '#5e4931';
+    c.fillRect(x - 1.4 * scale, y + 8, 2.8 * scale, 6 * scale);
+  }
+
+  function renderWorld() {
+    const c = wctx;
+    c.clearRect(0, 0, WORLD_W, WORLD_H);
+    c.imageSmoothingEnabled = false;
+
+    const colors = {
+      [TYPE.GRASS]: '#6f8057',
+      [TYPE.FOREST]: '#3d5037',
+      [TYPE.MOUNTAIN]: '#6b6655',
+      [TYPE.PATH]: '#ae9570',
+      [TYPE.WATER]: '#456e76',
+      [TYPE.BRIDGE]: '#8b6a44',
+      [TYPE.MARSH]: '#59664d',
+      [TYPE.SNOW]: '#dce4df'
+    };
+
+    for (let ty = 0; ty < ROWS; ty += 1) {
+      for (let tx = 0; tx < COLS; tx += 1) {
+        const i = TILE_INDEX(tx, ty);
+        const type = TYPES[i];
+        const x = tx * TILE;
+        const y = ty * TILE;
+        const h = hash2(tx, ty);
+        c.fillStyle = colors[type];
+        c.fillRect(x, y, TILE, TILE);
+
+        if (type === TYPE.GRASS || type === TYPE.PATH) {
+          c.fillStyle = type === TYPE.PATH ? 'rgba(80,58,32,.10)' : 'rgba(43,60,32,.13)';
+          if (h < 0.3) c.fillRect(x + 5 + h * 12, y + 8, 2, 1);
+          if (h > 0.76) c.fillRect(x + 19, y + 19 + h * 4, 3, 1);
+          if (type === TYPE.GRASS && h > 0.9) {
+            c.strokeStyle = 'rgba(53,73,37,.35)';
+            c.lineWidth = 1;
+            c.beginPath();
+            c.moveTo(x + 13, y + 25);
+            c.lineTo(x + 14, y + 18);
+            c.moveTo(x + 17, y + 25);
+            c.lineTo(x + 16, y + 19);
+            c.stroke();
+          }
+          if (type === TYPE.PATH && h < 0.18) {
+            c.fillStyle = 'rgba(238,224,193,.28)';
+            c.fillRect(x + 8, y + 12, 2, 2);
+            c.fillRect(x + 21, y + 23, 2, 1);
+          }
+        } else if (type === TYPE.FOREST) {
+          const d = hash2(tx + 3, ty + 9);
+          drawTree(c, x + 9, y + 17, 0.7 + d * 0.25, h > 0.55);
+          drawTree(c, x + 23, y + 24, 0.55 + h * 0.25, h < 0.5);
+        } else if (type === TYPE.MOUNTAIN) {
+          c.fillStyle = 'rgba(49,47,40,.14)';
+          c.beginPath();
+          c.moveTo(x + 2, y + 28);
+          c.lineTo(x + 14 + h * 8, y + 5);
+          c.lineTo(x + 31, y + 28);
+          c.closePath();
+          c.fill();
+          c.fillStyle = 'rgba(226,219,198,.16)';
+          c.beginPath();
+          c.moveTo(x + 11 + h * 6, y + 12);
+          c.lineTo(x + 14 + h * 8, y + 5);
+          c.lineTo(x + 19 + h * 5, y + 14);
+          c.closePath();
+          c.fill();
+        } else if (type === TYPE.WATER) {
+          c.strokeStyle = 'rgba(191,218,214,.20)';
+          c.lineWidth = 1;
+          c.beginPath();
+          c.moveTo(x + 3, y + 11 + h * 5);
+          c.quadraticCurveTo(x + 10, y + 7 + h * 5, x + 18, y + 11 + h * 5);
+          c.quadraticCurveTo(x + 25, y + 15 + h * 5, x + 31, y + 11 + h * 5);
+          c.stroke();
+          c.fillStyle = 'rgba(26,55,60,.12)';
+          c.fillRect(x, y + 27, TILE, 5);
+        } else if (type === TYPE.BRIDGE) {
+          c.fillStyle = 'rgba(51,34,18,.33)';
+          c.fillRect(x, y + 5, TILE, 2);
+          c.fillRect(x, y + 17, TILE, 2);
+          c.fillRect(x, y + 28, TILE, 2);
+          c.fillStyle = 'rgba(234,204,150,.13)';
+          for (let p = 0; p < 3; p += 1) c.fillRect(x + 4, y + 9 + p * 10, 24, 1);
+        } else if (type === TYPE.MARSH) {
+          c.fillStyle = 'rgba(38,54,39,.25)';
+          c.fillRect(x + 3, y + 21 + h * 5, 17, 5);
+          c.strokeStyle = 'rgba(134,146,95,.4)';
+          c.beginPath();
+          c.moveTo(x + 20, y + 26);
+          c.lineTo(x + 18, y + 14);
+          c.moveTo(x + 24, y + 26);
+          c.lineTo(x + 26, y + 16);
+          c.stroke();
+          if (h > 0.66) {
+            c.fillStyle = 'rgba(188,201,183,.18)';
+            c.beginPath();
+            c.ellipse(x + 10, y + 9, 11, 4, 0, 0, Math.PI * 2);
+            c.fill();
+          }
+        } else if (type === TYPE.SNOW) {
+          c.fillStyle = 'rgba(152,173,180,.16)';
+          if (h < 0.35) c.fillRect(x + 4, y + 18, 18, 2);
+          c.fillStyle = 'rgba(255,255,255,.38)';
+          if (h > 0.7) c.fillRect(x + 22, y + 7, 1, 1);
+          c.fillStyle = 'rgba(126,151,162,.15)';
+          c.beginPath();
+          c.moveTo(x + 19 + h * 6, y + 13);
+          c.lineTo(x + 30, y + 28);
+          c.lineTo(x + 12, y + 28);
+          c.closePath();
+          c.fill();
+        }
+      }
+    }
+
+    // 主路线虚线
+    c.save();
+    c.strokeStyle = 'rgba(111,20,15,.24)';
+    c.lineWidth = 2;
+    c.setLineDash([3, 10]);
+    c.beginPath();
+    ROUTE.forEach((p, index) => { if (index === 0) c.moveTo(p[0], p[1]); else c.lineTo(p[0], p[1]); });
+    c.stroke();
+    c.restore();
+
+    // 站点地标
+    STATIONS.forEach((st) => drawStationStatic(c, st));
+
+    // 区域名
+    const labels = [
+      ['江西', 760, 1080], ['广西', 1390, 1090], ['贵州', 2070, 1080],
+      ['四川', 2930, 1010], ['雪山', 3540, 760], ['草地', 4290, 790], ['甘肃', 5100, 600]
+    ];
+    c.save();
+    c.font = '13px "Noto Serif SC","Songti SC",serif';
+    c.fillStyle = 'rgba(240,228,202,.22)';
+    c.textAlign = 'center';
+    labels.forEach(([text, x, y]) => {
+      c.fillText(text, x, y);
+      c.fillStyle = 'rgba(240,228,202,.11)';
+      c.fillRect(x - 22, y + 5, 44, 1);
+      c.fillStyle = 'rgba(240,228,202,.22)';
+    });
+    c.restore();
+  }
+
+  function drawStationStatic(c, st) {
+    const x = st.x;
+    const y = st.y;
+    c.save();
+    c.translate(x, y);
+
+    // 站点空地
+    c.strokeStyle = 'rgba(230,210,168,.22)';
+    c.lineWidth = 1;
+    c.setLineDash([4, 7]);
+    c.beginPath();
+    c.arc(0, 0, 57, 0, Math.PI * 2);
+    c.stroke();
+    c.setLineDash([]);
+
+    // 地标建筑/地形标识
+    if (st.id === 0) {
+      c.fillStyle = '#8f7651'; c.fillRect(-45, 8, 30, 17);
+      c.fillStyle = '#6e5a3d'; c.beginPath(); c.moveTo(-50, 9); c.lineTo(-30, -5); c.lineTo(-10, 9); c.fill();
+      c.fillStyle = '#a58c63'; c.fillRect(9, 15, 37, 13);
+      c.fillStyle = '#6e5a3d'; c.beginPath(); c.moveTo(4, 16); c.lineTo(27, 0); c.lineTo(51, 16); c.fill();
+      c.fillStyle = '#d4b473'; c.fillRect(-36, 15, 5, 6); c.fillRect(21, 20, 5, 6);
+      c.strokeStyle = '#7f6644'; c.lineWidth = 3;
+      c.beginPath(); c.moveTo(-4, 37); c.lineTo(-4, -27); c.stroke();
+      c.fillStyle = '#a58b61'; c.fillRect(-9, 36, 10, 4);
+    } else if (st.id === 1) {
+      c.fillStyle = '#706e5e'; c.fillRect(-38, 22, 76, 10);
+      c.fillStyle = '#8d8b77'; c.fillRect(-30, 12, 17, 10); c.fillRect(-8, 8, 20, 14); c.fillRect(18, 15, 16, 8);
+      c.strokeStyle = '#6f5434'; c.lineWidth = 3;
+      c.beginPath(); c.moveTo(0, 37); c.lineTo(0, -24); c.stroke();
+      c.fillStyle = 'rgba(65,35,25,.22)'; c.beginPath(); c.ellipse(0, 35, 38, 8, 0, 0, Math.PI * 2); c.fill();
+    } else if (st.id === 2) {
+      c.fillStyle = '#8a7654'; c.fillRect(-40, 2, 80, 36);
+      c.fillStyle = '#5f523c'; c.beginPath(); c.moveTo(-48, 3); c.lineTo(0, -28); c.lineTo(48, 3); c.fill();
+      c.fillStyle = '#d3b777'; c.fillRect(-25, 13, 12, 14); c.fillRect(-4, 13, 12, 14); c.fillRect(17, 13, 12, 14);
+      c.fillStyle = '#7b1b15'; c.beginPath(); c.arc(0, -5, 5, 0, Math.PI * 2); c.fill();
+      c.fillStyle = '#e3c681'; c.beginPath(); c.arc(0, -5, 2, 0, Math.PI * 2); c.fill();
+    } else if (st.id === 3) {
+      c.strokeStyle = 'rgba(50,37,22,.8)'; c.lineWidth = 2;
+      c.beginPath(); c.moveTo(-57, -19); c.quadraticCurveTo(0, 3, 57, -19); c.stroke();
+      c.beginPath(); c.moveTo(-57, -9); c.quadraticCurveTo(0, 14, 57, -9); c.stroke();
+      c.strokeStyle = 'rgba(156,130,84,.8)'; c.lineWidth = 1;
+      for (let i = -5; i <= 5; i += 1) {
+        const px = i * 10;
+        c.beginPath(); c.moveTo(px, -15); c.lineTo(px, 1); c.stroke();
+      }
+      c.fillStyle = '#7c6646'; c.fillRect(-5, 28, 10, 6);
+    } else if (st.id === 4) {
+      c.fillStyle = '#9ca9a7'; c.beginPath(); c.moveTo(-30, 30); c.lineTo(-11, 1); c.lineTo(3, 16); c.lineTo(16, -8); c.lineTo(33, 30); c.closePath(); c.fill();
+      c.fillStyle = '#eef1ec'; c.beginPath(); c.moveTo(-21, 14); c.lineTo(-11, 1); c.lineTo(-1, 13); c.closePath(); c.fill();
+      c.beginPath(); c.moveTo(8, 13); c.lineTo(16, -8); c.lineTo(25, 14); c.closePath(); c.fill();
+      c.fillStyle = '#6d5c42'; c.beginPath(); c.arc(31, 27, 3, 0, Math.PI * 2); c.fill();
+    } else if (st.id === 5) {
+      c.fillStyle = 'rgba(47,68,45,.7)'; c.beginPath(); c.ellipse(-23, 30, 25, 9, 0, 0, Math.PI * 2); c.fill();
+      c.fillStyle = '#6b7153'; c.fillRect(-4, 18, 8, 16);
+      c.fillStyle = '#8a8c68'; c.fillRect(-8, 14, 16, 6);
+      c.strokeStyle = 'rgba(151,156,103,.8)'; c.lineWidth = 1;
+      for (let i = -2; i <= 2; i += 1) {
+        c.beginPath(); c.moveTo(22 + i * 5, 34); c.lineTo(19 + i * 6, 16); c.stroke();
+      }
+    } else if (st.id === 6) {
+      c.fillStyle = '#907749'; c.fillRect(-44, 29, 88, 6);
+      c.fillStyle = '#6f5738'; c.fillRect(-38, 13, 6, 22); c.fillRect(32, 13, 6, 22);
+      c.fillStyle = '#a48b5e'; c.beginPath(); c.moveTo(-42, 13); c.lineTo(-35, 2); c.lineTo(-28, 13); c.fill();
+      c.beginPath(); c.moveTo(28, 13); c.lineTo(35, 2); c.lineTo(42, 13); c.fill();
+      c.fillStyle = '#7b1b15'; c.fillRect(-50, 37, 100, 2);
+    }
+
+    // 中文站名
+    c.textAlign = 'center';
+    c.font = '600 18px "Noto Serif SC","Songti SC",serif';
+    c.fillStyle = 'rgba(25,18,12,.52)';
+    c.fillText(st.name, 1, 91);
+    c.fillStyle = 'rgba(246,234,210,.88)';
+    c.fillText(st.name, 0, 90);
+    c.font = '9px "PingFang SC","Microsoft YaHei",sans-serif';
+    c.fillStyle = 'rgba(242,228,201,.46)';
+    c.fillText(st.date, 0, 104);
+    c.restore();
+  }
+
+  /* =====================================================
+     四、存档与状态
+     ===================================================== */
+  function freshState() {
+    const res = { ...INITIAL_RES };
+    const spawn = STATIONS[0].spawn;
+    return {
+      version: 1,
+      res,
+      mainDone: [false, false, false, false, false, false, false],
+      choices: {},
+      collected: [],
+      sideDone: [],
+      buffs: { ammoGuard: 0, snowResist: false },
+      player: { x: spawn.x, y: spawn.y, dir: 'down' },
+      visited: [],
+      checkpoint: { res: { ...res }, x: spawn.x, y: spawn.y, label: '瑞金' },
+      finished: false,
+      startedAt: Date.now(),
+      playSeconds: 0
+    };
+  }
+
+  function normalizeState(raw) {
+    const fresh = freshState();
+    if (!raw || typeof raw !== 'object') return fresh;
+    const s = fresh;
+
+    if (raw.res && typeof raw.res === 'object') {
+      ['troops', 'food', 'ammo'].forEach((key) => {
+        const value = Number(raw.res[key]);
+        if (Number.isFinite(value)) s.res[key] = clamp(Math.round(value), 0, MAX_RES[key]);
+      });
+    }
+
+    if (Array.isArray(raw.mainDone)) {
+      let locked = false;
+      for (let i = 0; i < 7; i += 1) {
+        const done = Boolean(raw.mainDone[i]) && !locked;
+        s.mainDone[i] = done;
+        if (!done) locked = true;
+      }
+    }
+
+    if (raw.choices && typeof raw.choices === 'object') {
+      Object.keys(raw.choices).forEach((key) => {
+        const id = Number(key);
+        const index = Number(raw.choices[key]);
+        if (id >= 0 && id <= 5 && index >= 0 && index <= 2) s.choices[id] = index;
+      });
+    }
+
+    const validItems = new Set(ALL_ITEMS.map((item) => item.id));
+    if (Array.isArray(raw.collected)) {
+      s.collected = [...new Set(raw.collected.filter((id) => validItems.has(id)))];
+    }
+    if (Array.isArray(raw.sideDone)) {
+      s.sideDone = [...new Set(raw.sideDone.map(Number).filter((id) => id >= 0 && id <= 6))];
+    }
+
+    if (raw.buffs && typeof raw.buffs === 'object') {
+      const guard = Number(raw.buffs.ammoGuard);
+      s.buffs.ammoGuard = Number.isFinite(guard) ? clamp(guard, 0, 30) : 0;
+      s.buffs.snowResist = Boolean(raw.buffs.snowResist);
+    }
+
+    if (raw.player && Number.isFinite(Number(raw.player.x)) && Number.isFinite(Number(raw.player.y))) {
+      s.player.x = Number(raw.player.x);
+      s.player.y = Number(raw.player.y);
+      if (['up', 'down', 'left', 'right'].includes(raw.player.dir)) s.player.dir = raw.player.dir;
+    }
+
+    if (Array.isArray(raw.visited)) {
+      s.visited = [...new Set(raw.visited.map(Number).filter((id) => id >= 0 && id <= 6))];
+    }
+
+    if (raw.checkpoint && raw.checkpoint.res && Number.isFinite(Number(raw.checkpoint.x)) && Number.isFinite(Number(raw.checkpoint.y))) {
+      s.checkpoint = {
+        res: {
+          troops: clamp(Number(raw.checkpoint.res.troops) || INITIAL_RES.troops, 1, MAX_RES.troops),
+          food: clamp(Number(raw.checkpoint.res.food) || INITIAL_RES.food, 1, MAX_RES.food),
+          ammo: clamp(Number(raw.checkpoint.res.ammo) || INITIAL_RES.ammo, 1, MAX_RES.ammo)
+        },
+        x: Number(raw.checkpoint.x),
+        y: Number(raw.checkpoint.y),
+        label: typeof raw.checkpoint.label === 'string' ? raw.checkpoint.label : '上一站'
+      };
+    }
+
+    const priorComplete = s.mainDone.slice(0, 6).every(Boolean);
+    s.finished = Boolean(raw.finished) && priorComplete;
+    if (s.finished) s.mainDone[6] = true;
+    s.startedAt = Number(raw.startedAt) || Date.now();
+    s.playSeconds = Number(raw.playSeconds) || 0;
+    return s;
+  }
+
+  function loadState() {
+    let raw = null;
+    try {
+      raw = window.localStorage.getItem(SAVE_KEY);
+    } catch (error) {
+      game.storageOK = false;
+      return freshState();
+    }
+    if (!raw) return freshState();
+    try {
+      return normalizeState(JSON.parse(raw));
+    } catch (error) {
+      return freshState();
+    }
+  }
+
+  function saveState() {
+    if (!state) return;
+    if (!game.storageOK) {
+      updateStorageNote();
+      return;
+    }
+    try {
+      const data = {
+        version: 1,
+        res: state.res,
+        mainDone: state.mainDone,
+        choices: state.choices,
+        collected: state.collected,
+        sideDone: state.sideDone,
+        buffs: state.buffs,
+        player: state.player,
+        visited: state.visited,
+        checkpoint: state.checkpoint,
+        finished: state.finished,
+        startedAt: state.startedAt,
+        playSeconds: Math.round(state.playSeconds)
+      };
+      window.localStorage.setItem(SAVE_KEY, JSON.stringify(data));
+      game.saveDirty = false;
+      updateStorageNote();
+    } catch (error) {
+      game.storageOK = false;
+      updateStorageNote();
+    }
+  }
+
+  function scheduleSave() {
+    game.saveDirty = true;
+    window.clearTimeout(game.saveTimer);
+    game.saveTimer = window.setTimeout(saveState, 550);
+  }
+
+  function updateStorageNote() {
+    const note = $('storageNote');
+    const meta = $('saveState');
+    if (!note || !meta) return;
+    if (game.storageOK) {
+      note.textContent = '进度会自动保存在本机。';
+      note.classList.remove('warn');
+      meta.textContent = '长征档案已连接 · 自动存档';
+    } else {
+      note.textContent = '当前预览环境禁止本地存储：本次进度只保留在页面内。';
+      note.classList.add('warn');
+      meta.textContent = '预览模式 · 本地存档不可用';
+    }
+  }
+
+  /* =====================================================
+     五、碰撞、移动与相机
+     ===================================================== */
+  function isBlockedAt(x, y, withGates) {
+    if (x < 8 || y < 8 || x > WORLD_W - 8 || y > WORLD_H - 8) return true;
+    const tx = Math.floor(x / TILE);
+    const ty = Math.floor(y / TILE);
+    if (tx < 0 || ty < 0 || tx >= COLS || ty >= ROWS) return true;
+    if (SOLID[TILE_INDEX(tx, ty)]) return true;
+    if (withGates !== false && state) {
+      for (let i = 0; i < GATES.length; i += 1) {
+        const gate = GATES[i];
+        if (state.mainDone[gate.after]) continue;
+        const line = pointSegmentDistance(
+          x, y,
+          gate.x - gate.dx, gate.y - gate.dy,
+          gate.x + gate.dx, gate.y + gate.dy
+        );
+        if (line.dist < 17) return true;
+      }
+    }
+    return false;
+  }
+
+  function canStandAt(x, y) {
+    const r = 8;
+    if (isBlockedAt(x, y)) return false;
+    for (let i = 0; i < 8; i += 1) {
+      const angle = (Math.PI * 2 * i) / 8;
+      if (isBlockedAt(x + Math.cos(angle) * r, y + Math.sin(angle) * r)) return false;
+    }
+    return true;
+  }
+
+  function nearestLockedGate() {
+    let best = null;
+    GATES.forEach((gate) => {
+      if (state.mainDone[gate.after]) return;
+      const d = Math.hypot(state.player.x - gate.x, state.player.y - gate.y);
+      if (!best || d < best.dist) best = { gate, dist: d };
+    });
+    return best;
+  }
+
+  function findStationAt(x, y, radius = 300) {
+    let best = null;
+    STATIONS.forEach((st) => {
+      const d = Math.hypot(x - st.x, y - st.y);
+      if (d <= radius && (!best || d < best.dist)) best = { station: st, dist: d };
+    });
+    return best;
+  }
+
+  function stationUnlocked(id) {
+    return id === 0 || Boolean(state.mainDone[id - 1]);
+  }
+
+  function currentStationId() {
+    const index = state.mainDone.findIndex((done) => !done);
+    return index === -1 ? 6 : index;
+  }
+
+  function completedCount() {
+    return state.mainDone.filter(Boolean).length;
+  }
+
+  function allBeforeDone(id) {
+    for (let i = 0; i < id; i += 1) if (!state.mainDone[i]) return false;
+    return true;
+  }
+
+  function itemPosition(st, item) {
+    return { x: st.x + item.ox, y: st.y + item.oy };
+  }
+
+  function sidePosition(st) {
+    return { x: st.x + st.side.ox, y: st.y + st.side.oy };
+  }
+
+  function updateMovement(dt) {
+    if (game.paused || game.failed || game.modalOpen) {
+      game.moving = false;
+      return;
+    }
+    let dx = 0;
+    let dy = 0;
+    const k = game.keys;
+    const t = game.touchDirs;
+    if (k.has('arrowleft') || k.has('a') || t.has('left')) dx -= 1;
+    if (k.has('arrowright') || k.has('d') || t.has('right')) dx += 1;
+    if (k.has('arrowup') || k.has('w') || t.has('up')) dy -= 1;
+    if (k.has('arrowdown') || k.has('s') || t.has('down')) dy += 1;
+
+    if (!dx && !dy) {
+      game.moving = false;
+      return;
+    }
+    const len = Math.hypot(dx, dy);
+    dx /= len;
+    dy /= len;
+    const running = k.has('shift');
+    const speed = running ? 188 : 142;
+    game.moving = true;
+    game.walkTime += dt * (running ? 1.3 : 1);
+    if (Math.abs(dx) > Math.abs(dy)) state.player.dir = dx > 0 ? 'right' : 'left';
+    else state.player.dir = dy > 0 ? 'down' : 'up';
+
+    const nx = state.player.x + dx * speed * dt;
+    if (canStandAt(nx, state.player.y)) state.player.x = nx;
+    else showGateHintIfNear();
+
+    const ny = state.player.y + dy * speed * dt;
+    if (canStandAt(state.player.x, ny)) state.player.y = ny;
+    else showGateHintIfNear();
+
+    state.playSeconds += dt;
+  }
+
+  function updateCamera(dt, snap) {
+    if (!state) return;
+    const maxX = Math.max(0, WORLD_W - game.view.w);
+    const maxY = Math.max(0, WORLD_H - game.view.h);
+    const tx = clamp(state.player.x - game.view.w / 2, 0, maxX);
+    const ty = clamp(state.player.y - game.view.h / 2, 0, maxY);
+    if (snap) {
+      game.camera.x = tx;
+      game.camera.y = ty;
+      return;
+    }
+    const smooth = Math.min(1, dt * 7.5);
+    game.camera.x += (tx - game.camera.x) * smooth;
+    game.camera.y += (ty - game.camera.y) * smooth;
+  }
+
+  function resizeCanvas() {
+    const frame = $('gameFrame');
+    const rect = frame.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    game.dpr = dpr;
+    game.view.w = Math.max(320, rect.width);
+    game.view.h = Math.max(280, rect.height);
+    canvas.width = Math.round(game.view.w * dpr);
+    canvas.height = Math.round(game.view.h * dpr);
+    canvas.style.width = game.view.w + 'px';
+    canvas.style.height = game.view.h + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.imageSmoothingEnabled = false;
+    if (state) updateCamera(0, true);
+  }
+
+  /* =====================================================
+     六、资源、危险地形
+     ===================================================== */
+  function animateNumber(el, from, to, duration, key) {
+    if (!el) return;
+    const start = performance.now();
+    cancelAnimationFrame(el._numberFrame);
+    if (from === to || duration <= 0) {
+      el.textContent = fmt.format(to);
+      game.displayed[key] = to;
+      return;
+    }
+    const tick = (now) => {
+      const p = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - p, 3);
+      const value = Math.round(from + (to - from) * eased);
+      el.textContent = fmt.format(value);
+      game.displayed[key] = value;
+      if (p < 1) el._numberFrame = requestAnimationFrame(tick);
+      else {
+        el.textContent = fmt.format(to);
+        game.displayed[key] = to;
+      }
+    };
+    el._numberFrame = requestAnimationFrame(tick);
+  }
+
+  function flashResourceDelta(key, value) {
+    const el = $('delta' + key.charAt(0).toUpperCase() + key.slice(1));
+    if (!el) return;
+    el.textContent = value ? (value > 0 ? '+' : '−') + fmt.format(Math.abs(value)) : '';
+    el.classList.remove('show');
+    void el.offsetWidth;
+    if (value) el.classList.add('show');
+  }
+
+  function renderResourcePanel(animate, deltas) {
+    ['troops', 'food', 'ammo'].forEach((key) => {
+      const cap = key.charAt(0).toUpperCase() + key.slice(1);
+      const valueEl = $('res' + cap);
+      const barEl = $('bar' + cap);
+      const card = document.querySelector('.res-card[data-res="' + key + '"]');
+      const target = state.res[key];
+      if (animate) animateNumber(valueEl, game.displayed[key], target, 540, key);
+      else {
+        valueEl.textContent = fmt.format(target);
+        game.displayed[key] = target;
+      }
+      const pct = clamp((target / INITIAL_RES[key]) * 100, 0, 100);
+      if (barEl) barEl.style.width = pct + '%';
+      if (card) {
+        const threshold = key === 'troops' ? 20000 : 20;
+        card.classList.toggle('low', target <= threshold);
+      }
+      if (deltas && deltas[key]) flashResourceDelta(key, deltas[key]);
+    });
+  }
+
+  function addFloatingText(text, color) {
+    if (!state) return;
+    game.floats.push({
+      x: state.player.x,
+      y: state.player.y - 28,
+      text,
+      color: color || '#ffb49e',
+      life: 1.5,
+      maxLife: 1.5
+    });
+  }
+
+  function applyResourceDelta(delta, options) {
+    const opts = options || {};
+    const actual = {};
+    ['troops', 'food', 'ammo'].forEach((key) => {
+      const change = Number(delta[key]) || 0;
+      const before = state.res[key];
+      state.res[key] = clamp(before + change, 0, MAX_RES[key]);
+      actual[key] = state.res[key] - before;
+    });
+    renderResourcePanel(true, actual);
+    if (opts.float !== false) {
+      const parts = [];
+      ['troops', 'food', 'ammo'].forEach((key) => {
+        if (actual[key]) parts.push((key === 'troops' ? '兵员' : key === 'food' ? '粮食' : '弹药') + ' ' + (actual[key] > 0 ? '+' : '−') + fmt.format(Math.abs(actual[key])));
+      });
+      if (parts.length) addFloatingText(parts.join(' · '), Object.values(actual).some((v) => v < 0) ? '#ffb49e' : '#c9df9e');
+    }
+    if (partsNotEmpty(actual)) scheduleSave();
+    updateResourceDanger();
+    return actual;
+  }
+
+  function partsNotEmpty(actual) {
+    return ['troops', 'food', 'ammo'].some((key) => actual[key] !== 0);
+  }
+
+  function updateResourceDanger() {
+    if (!state) return;
+    const zero = state.res.troops <= 0 || state.res.food <= 0 || state.res.ammo <= 0;
+    if (zero && !game.failed) {
+      game.pendingFail = state.res.food <= 0 ? '粮食耗尽' : state.res.troops <= 0 ? '兵员耗尽' : '弹药耗尽';
+    }
+  }
+
+  function applyMainCost(option) {
+    const effective = { ...option.cost };
+    let guardUsed = 0;
+    if (effective.ammo < 0 && state.buffs.ammoGuard > 0) {
+      guardUsed = Math.min(state.buffs.ammoGuard, -effective.ammo);
+      effective.ammo += guardUsed;
+      state.buffs.ammoGuard -= guardUsed;
+    }
+    const actual = applyResourceDelta(effective, { float: false });
+    return { actual, guardUsed, effective };
+  }
+
+  function hazardTick(type) {
+    const isSnow = type === TYPE.SNOW;
+    const delta = isSnow ? { food: -1, troops: -12 } : { food: -1, troops: -8 };
+    const actual = applyResourceDelta(delta, { float: false });
+    const parts = [];
+    if (actual.food) parts.push('粮食 ' + actual.food);
+    if (actual.troops) parts.push('兵员 ' + actual.troops);
+    if (parts.length) addFloatingText(parts.join(' · '), '#ffc0a2');
+    if (state.res.troops <= 0 || state.res.food <= 0 || state.res.ammo <= 0) {
+      failGame(state.res.troops <= 0 ? '兵员耗尽，部队已无法继续行军。' : state.res.food <= 0 ? '粮食耗尽，部队已无法继续行军。' : '弹药耗尽，部队已无法继续执行任务。');
+    }
+  }
+
+  function updateHazard(dt) {
+    const type = tileTypeAtWorld(state.player.x, state.player.y);
+    const hazard = HAZARD_TYPES.has(type);
+    const chip = $('hazardChip');
+    if (!hazard) {
+      game.hazardType = null;
+      game.hazardAccum = 0;
+      chip.hidden = true;
+      return;
+    }
+    game.hazardType = type;
+    chip.hidden = false;
+    chip.textContent = type === TYPE.SNOW ? '高寒缺氧 · 粮食与兵员持续消耗' : '沼泽行军 · 粮食与兵员持续消耗';
+    let rate = game.moving ? 0.78 : 1.12;
+    if (type === TYPE.SNOW && state.buffs.snowResist) rate *= 0.55;
+    game.hazardAccum = (game.hazardAccum || 0) + dt * rate;
+    const interval = type === TYPE.SNOW ? 4.5 : 5.2;
+    while (game.hazardAccum >= interval) {
+      game.hazardAccum -= interval;
+      hazardTick(type);
+      if (game.failed) break;
+    }
+  }
+
+  /* =====================================================
+     七、区域提示与交互检测
+     ===================================================== */
+  function showToast(text, duration) {
+    const toast = $('gameToast');
+    toast.textContent = text;
+    toast.classList.remove('show');
+    void toast.offsetWidth;
+    toast.classList.add('show');
+    clearTimeout(game.toastTimer);
+    game.toastTimer = setTimeout(() => toast.classList.remove('show'), duration || 2400);
+  }
+
+  function showAreaBanner(station) {
+    const banner = $('areaBanner');
+    $('areaTitle').textContent = station.name;
+    $('areaSub').textContent = station.date + ' · ' + station.intro;
+    banner.classList.add('show');
+    clearTimeout(showAreaBanner._timer);
+    showAreaBanner._timer = setTimeout(() => banner.classList.remove('show'), 2600);
+  }
+
+  function showGateHintIfNear() {
+    const near = nearestLockedGate();
+    if (!near || near.dist > 145) return;
+    const now = performance.now();
+    if (now - game.lastGateHint < 3200) return;
+    game.lastGateHint = now;
+    const gate = near.gate;
+    const station = STATIONS[gate.after + 1];
+    showToast('前方地形封锁 · 长征尚未行进至此。完成当前主线后，才能前往' + station.name + '。', 3200);
+  }
+
+  function updateAreaAndHud(force) {
+    const near = findStationAt(state.player.x, state.player.y, 292);
+    const areaId = near ? near.station.id : -1;
+    if (areaId !== game.lastArea) {
+      game.lastArea = areaId;
+      if (near) {
+        showAreaBanner(near.station);
+        if (!state.visited.includes(near.station.id)) {
+          state.visited.push(near.station.id);
+          const cpRes = { ...state.res };
+          state.checkpoint = {
+            res: cpRes,
+            x: near.station.spawn.x,
+            y: near.station.spawn.y,
+            label: near.station.name
+          };
+          scheduleSave();
+        }
+        game.mainZone = null;
+        game.sideZone = null;
+      } else {
+        game.mainZone = null;
+        game.sideZone = null;
+      }
+      updateHUD();
+    } else if (force) {
+      updateHUD();
+    }
+  }
+
+  function nearestInteractable() {
+    const player = state.player;
+    let best = null;
+    STATIONS.forEach((st) => {
+      if (!stationUnlocked(st.id)) return;
+      st.collectibles.forEach((item) => {
+        if (state.collected.includes(item.id)) return;
+        const p = itemPosition(st, item);
+        const d = Math.hypot(player.x - p.x, player.y - p.y);
+        if (d < 72 && (!best || d < best.dist)) best = { type: 'collect', station: st, item, dist: d };
+      });
+      if (!state.mainDone[st.id] && st.id < 6) {
+        const d = Math.hypot(player.x - st.x, player.y - st.y);
+        if (d < 86 && (!best || d < best.dist)) best = { type: 'main', station: st, dist: d };
+      }
+      if (st.id === 6 && !state.finished && allBeforeDone(6)) {
+        const d = Math.hypot(player.x - st.x, player.y - st.y);
+        if (d < 88 && (!best || d < best.dist)) best = { type: 'victory', station: st, dist: d };
+      }
+      if (!state.sideDone.includes(st.id)) {
+        const p = sidePosition(st);
+        const d = Math.hypot(player.x - p.x, player.y - p.y);
+        if (d < 74 && (!best || d < best.dist)) best = { type: 'side', station: st, dist: d };
+      }
+    });
+    return best;
+  }
+
+  function updateInteractionPrompt() {
+    const prompt = $('interactPrompt');
+    if (!state || game.modalOpen || game.failed) {
+      prompt.classList.remove('show');
+      return;
+    }
+    const near = nearestInteractable();
+    if (!near) {
+      const gate = nearestLockedGate();
+      if (gate && gate.dist < 145) {
+        $('interactText').textContent = '查看封锁';
+        prompt.classList.add('show');
+      } else {
+        prompt.classList.remove('show');
+      }
+      return;
+    }
+    const text = near.type === 'collect' ? '阅读史料' : near.type === 'main' ? '触发主线事件' : near.type === 'victory' ? '举行会师' : '遇见支线';
+    $('interactText').textContent = text;
+    prompt.classList.add('show');
+  }
+
+  function interact() {
+    if (game.modalOpen || game.paused || game.failed) return;
+    const near = nearestInteractable();
+    if (!near) {
+      const gate = nearestLockedGate();
+      if (gate && gate.dist < 145) showGateHintIfNear();
+      return;
+    }
+    if (near.type === 'collect') collectItem(near.station, near.item);
+    else if (near.type === 'main') openMain(near.station);
+    else if (near.type === 'victory') showVictory(false);
+    else if (near.type === 'side') openSide(near.station);
+  }
+
+  function updateInteractions() {
+    if (game.paused || game.failed || game.modalOpen) return;
+    if (performance.now() < game.interactionCooldown) return;
+    const player = state.player;
+
+    // 主线：进入核心圈自动触发；离开后重置，避免关闭后连环弹出
+    for (let i = 0; i < 6; i += 1) {
+      const st = STATIONS[i];
+      if (state.mainDone[i] || !stationUnlocked(i)) continue;
+      const d = Math.hypot(player.x - st.x, player.y - st.y);
+      if (d < 58) {
+        if (game.mainZone !== i) {
+          game.mainZone = i;
+          openMain(st);
+          return;
+        }
+      } else if (d > 90 && game.mainZone === i) {
+        game.mainZone = null;
+      }
+    }
+
+    // 会宁终点
+    const huining = STATIONS[6];
+    if (!state.finished && allBeforeDone(6)) {
+      const d = Math.hypot(player.x - huining.x, player.y - huining.y);
+      if (d < 62) {
+        if (!game.victoryZone) {
+          game.victoryZone = true;
+          showVictory(false);
+          return;
+        }
+      } else if (d > 105) {
+        game.victoryZone = false;
+      }
+    }
+
+    // 收集品：靠近即阅读并收入背包
+    for (let i = 0; i < STATIONS.length; i += 1) {
+      const st = STATIONS[i];
+      if (!stationUnlocked(i)) continue;
+      for (let j = 0; j < st.collectibles.length; j += 1) {
+        const item = st.collectibles[j];
+        if (state.collected.includes(item.id)) continue;
+        const p = itemPosition(st, item);
+        if (Math.hypot(player.x - p.x, player.y - p.y) < 31) {
+          collectItem(st, item);
+          return;
+        }
+      }
+    }
+
+    // 支线：进入范围后按概率触发；离开再回来可以再次尝试
+    for (let i = 0; i < STATIONS.length; i += 1) {
+      const st = STATIONS[i];
+      if (!stationUnlocked(i) || state.sideDone.includes(i)) continue;
+      const p = sidePosition(st);
+      const d = Math.hypot(player.x - p.x, player.y - p.y);
+      if (d < 46) {
+        if (game.sideZone !== i) {
+          game.sideZone = i;
+          if (Math.random() < 0.72) {
+            openSide(st);
+            return;
+          }
+          showToast('你似乎听见远处有人呼喊，但一转眼又被人群和风雪遮住了。再走走看。', 2800);
+        }
+      } else if (d > 92 && game.sideZone === i) {
+        game.sideZone = null;
+      }
+    }
+  }
+
+  /* =====================================================
+     八、侧栏 UI
+     ===================================================== */
+  function renderTimeline() {
+    const timeline = $('timeline');
+    const current = currentStationId();
+    timeline.innerHTML = STATIONS.map((st) => {
+      const done = state.mainDone[st.id];
+      const unlocked = stationUnlocked(st.id);
+      const isCurrent = !done && st.id === current;
+      const cls = done ? 'done' : isCurrent ? 'current' : !unlocked ? 'locked' : '';
+      const sub = done ? '已完成' : isCurrent ? '当前目标' : !unlocked ? '未解锁' : '可前往';
+      return (
+        '<div class="tl-row ' + cls + '">' +
+          '<span class="tl-dot">' + (done ? '✓' : st.id + 1) + '</span>' +
+          '<div><span class="tl-name">' + st.title + '</span><span class="tl-sub">' + sub + '</span></div>' +
+          '<span class="tl-date">' + st.date + '</span>' +
+        '</div>'
+      );
+    }).join('');
+    const bars = $('miniProgress');
+    if (!bars.children.length) {
+      for (let i = 0; i < 7; i += 1) bars.appendChild(document.createElement('i'));
+    }
+    [...bars.children].forEach((bar, i) => {
+      bar.className = state.mainDone[i] ? 'done' : i === current && !state.mainDone[i] ? 'current' : '';
+    });
+    $('progressCount').textContent = completedCount();
+  }
+
+  function renderBag() {
+    const list = $('bagList');
+    const items = ALL_ITEMS.filter((item) => state.collected.includes(item.id));
+    $('bagCount').textContent = items.length + ' / ' + TOTAL_ITEMS;
+    if (!items.length) {
+      list.innerHTML = '<div class="bag-empty">尚未收集到史料。<br>在站点内寻找发光的纸条与日记，走近即可阅读并收入背包。</div>';
+      return;
+    }
+    list.innerHTML = items.map((item) =>
+      '<button class="bag-item" type="button" data-item-id="' + item.id + '">' +
+        '<span class="paper-ico">史</span>' +
+        '<span><strong>' + item.title + '</strong><small>' + item.stationName + ' · ' + item.kind + '</small></span>' +
+      '</button>'
+    ).join('');
+  }
+
+  function updateHUD() {
+    if (!state) return;
+    const current = currentStationId();
+    const currentStation = STATIONS[current];
+    const near = findStationAt(state.player.x, state.player.y, 292);
+    const location = $('locationChip');
+    const objectiveChip = $('objectiveChip');
+    const taskTitle = $('taskTitle');
+    const taskSub = $('taskSub');
+
+    if (state.finished) {
+      location.textContent = '甘肃 · 会宁 · 长征胜利结束';
+      objectiveChip.textContent = '长征胜利结束';
+      taskTitle.textContent = '胜利会师 · 长征结束';
+      taskSub.textContent = '全部七个历史节点已走过。你可以继续探索、收集史料，或查看会师复盘。';
+      $('reviewBtn').hidden = false;
+      return;
+    }
+    $('reviewBtn').hidden = true;
+
+    if (near) {
+      location.textContent = near.station.area + ' · ' + near.station.date;
+    } else {
+      location.textContent = '行军途中 · 向' + currentStation.name;
+    }
+
+    if (near && near.station.id === current && !state.mainDone[current]) {
+      objectiveChip.textContent = near.station.name + ' · 主线未完成';
+      taskTitle.textContent = '主线 · ' + near.station.title;
+      taskSub.textContent = '走到区域中央的红旗地标，触发第 ' + (current + 1) + ' 站主线事件。探索时留意闪光物和需要帮助的人。';
+      return;
+    }
+
+    if (near && state.mainDone[near.station.id]) {
+      const next = STATIONS[current];
+      objectiveChip.textContent = '主线完成 · 继续前进';
+      taskTitle.textContent = near.station.name + '主线已完成';
+      taskSub.textContent = state.mainDone[6] ? '长征胜利结束，可以继续探索。' : '沿山路前往' + next.name + '，或继续在本区域寻找史料。';
+      return;
+    }
+
+    if (current === 6) {
+      objectiveChip.textContent = '终点 · 会宁';
+      taskTitle.textContent = '前往会宁会师';
+      taskSub.textContent = '沿路线抵达会宁地标，完成长征最后的会师。';
+    } else {
+      objectiveChip.textContent = '向' + currentStation.name + '行军';
+      taskTitle.textContent = '沿山路前往' + currentStation.name;
+      taskSub.textContent = '主线站点按长征真实顺序解锁。完成当前站后，前方封锁才会解除。';
+    }
+  }
+
+  function renderAllUI() {
+    renderResourcePanel(false);
+    renderTimeline();
+    renderBag();
+    updateHUD();
+    updateStorageNote();
+  }
+
+  /* =====================================================
+     九、统一弹窗
+     ===================================================== */
+  function openModal(opts) {
+    const layer = $('modalLayer');
+    const closeBtn = $('modalClose');
+    const body = $('modalBody');
+    const actions = $('modalActions');
+    game.modalOpen = true;
+    game.paused = true;
+    game.keys.clear();
+    game.touchDirs.clear();
+    document.body.classList.add('modal-open');
+    layer.hidden = false;
+    layer.classList.toggle('wide', Boolean(opts.wide));
+    $('modalKicker').textContent = opts.kicker || '长征沙盘';
+    $('modalTitle').textContent = opts.title || '';
+    body.innerHTML = opts.body || '';
+    actions.innerHTML = '';
+    closeBtn.hidden = opts.closable === false;
+    closeBtn.onclick = () => { if (opts.closable !== false) closeModal(); };
+    $('modalBackdrop').onclick = () => { if (opts.closable !== false) closeModal(); };
+    $('modalCard').scrollTop = 0;
+
+    (opts.actions || []).forEach((action) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'btn ' + (action.className || 'btn-ghost');
+      btn.textContent = action.label;
+      btn.addEventListener('click', () => {
+        if (action.onClick) action.onClick();
+        else closeModal();
+      });
+      actions.appendChild(btn);
+    });
+
+    setTimeout(() => {
+      const target = actions.querySelector('.btn-primary')
+        || actions.querySelector('.btn')
+        || body.querySelector('.choice-btn')
+        || (closeBtn.hidden ? $('modalCard') : closeBtn);
+      if (target && game.modalOpen) target.focus({ preventScroll: true });
+    }, 50);
+  }
+
+  function closeModal(force) {
+    if (!game.modalOpen && !force) return;
+    $('modalLayer').hidden = true;
+    $('modalBody').innerHTML = '';
+    $('modalActions').innerHTML = '';
+    document.body.classList.remove('modal-open');
+    game.modalOpen = false;
+    if (!game.failed) game.paused = false;
+    game.interactionCooldown = performance.now() + 450;
+    game.keys.clear();
+    game.touchDirs.clear();
+    if (canvas) canvas.focus({ preventScroll: true });
+  }
+
+  function formatCostChips(actual) {
+    const labels = { troops: '兵员', food: '粮食', ammo: '弹药' };
+    return ['troops', 'food', 'ammo'].filter((key) => actual[key]).map((key) => {
+      const value = actual[key];
+      return '<span class="cost-chip">' + labels[key] + ' ' + (value > 0 ? '+' : '−') + fmt.format(Math.abs(value)) + '</span>';
+    }).join('');
+  }
+
+  /* ------------------ 主线 ------------------ */
+  function openMain(station) {
+    if (!station || !station.main || state.mainDone[station.id] || game.modalOpen) return;
+    game.mainZone = station.id;
+    const body = (
+      '<p class="lead">' + station.main.story + '</p>' +
+      '<p>' + station.main.question + '</p>' +
+      '<div class="section-label">选择行军方案</div>' +
+      '<div class="choice-list">' +
+        station.main.options.map((option, index) =>
+          '<button class="choice-btn" type="button" data-choice="' + index + '">' +
+            '<span class="choice-letter">' + option.letter + '</span>' +
+            '<span class="choice-copy"><strong>' + option.title + '</strong><small>' + option.desc + '</small></span>' +
+          '</button>'
+        ).join('') +
+      '</div>' +
+      '<p class="source-line">重大历史事件依据《中国共产党简史》、中央党史和文献研究院公开资料。正确选项不会在作答前标注。</p>'
+    );
+    openModal({
+      kicker: '主线事件 · 第 ' + (station.id + 1) + ' 站',
+      title: station.title,
+      body,
+      actions: [],
+      closable: false
+    });
+    $('modalBody').querySelectorAll('.choice-btn').forEach((btn) => {
+      btn.addEventListener('click', () => chooseMain(station, Number(btn.dataset.choice)));
+    });
+  }
+
+  function chooseMain(station, index) {
+    if (state.mainDone[station.id]) return;
+    const option = station.main.options[index];
+    if (!option) return;
+    $('modalBody').querySelectorAll('.choice-btn').forEach((btn) => { btn.disabled = true; });
+    const costResult = applyMainCost(option);
+    state.mainDone[station.id] = true;
+    state.choices[station.id] = index;
+    const hasZero = state.res.troops <= 0 || state.res.food <= 0 || state.res.ammo <= 0;
+    if (!hasZero && station.id < 6) {
+      const next = STATIONS[station.id + 1];
+      state.checkpoint = {
+        res: { ...state.res },
+        x: next.spawn.x,
+        y: next.spawn.y,
+        label: next.name
+      };
+    }
+    saveState();
+    renderTimeline();
+    renderResourcePanel(true);
+    updateHUD();
+
+    const guardNote = costResult.guardUsed
+      ? '<p class="small">此前支线的向导帮助生效：本次弹药损耗减少了 ' + costResult.guardUsed + '。</p>'
+      : '';
+    const body = (
+      '<div class="result-banner ' + (option.correct ? 'correct' : 'wrong') + '">' +
+        '<strong>' + (option.correct ? '符合历史条件' : '不符合客观条件') + '</strong>' +
+        '<span>' + (option.correct ? '这是与史实相符的选择。' : '这个方案在当时的历史条件下难以走通。') + '</span>' +
+      '</div>' +
+      '<p>' + station.main.fact + '</p>' +
+      '<div class="cost-row">' + formatCostChips(costResult.actual) + '</div>' +
+      guardNote +
+      '<p class="source-line">史实依据：《中国共产党简史》、中央党史和文献研究院公开资料。推演资源数值为教学互动数据，不等同于精确战史统计。</p>' +
+      (hasZero ? '<p class="small">注意：已有资源耗尽，继续后将进入失败复盘。</p>' : '')
+    );
+    openModal({
+      kicker: '史实复盘 · ' + (option.correct ? '历史抉择' : '此路不通'),
+      title: option.title,
+      body,
+      closable: false,
+      actions: [{
+        label: hasZero ? '查看推演结果' : '继续行军',
+        className: 'btn-primary',
+        onClick: () => {
+          closeModal();
+          if (hasZero) {
+            game.paused = true;
+            setTimeout(() => failGame(state.res.troops <= 0 ? '兵员耗尽，部队已无法继续行军。' : state.res.food <= 0 ? '粮食耗尽，部队已无法继续行军。' : '弹药耗尽，部队已无法继续执行任务。'), 160);
+          } else {
+            const next = STATIONS[station.id + 1];
+            showToast(next ? '第 ' + (station.id + 1) + ' 站主线完成 · 前方封锁解除，前往' + next.name : '长征即将抵达终点', 3200);
+            updateHUD();
+          }
+        }
+      }]
+    });
+  }
+
+  /* ------------------ 支线 ------------------ */
+  function openSide(station) {
+    if (state.sideDone.includes(station.id) || game.modalOpen) return;
+    game.sideZone = station.id;
+    const body = (
+      '<p class="lead">' + station.side.story + '</p>' +
+      '<p class="small">支线主题：' + station.side.theme + '。支线不强制体验，也不会卡住主线。完成后可获得少量补给。</p>' +
+      '<p class="source-line">' + station.side.source + '</p>' +
+      '<div class="cost-row"><span class="cost-chip gain">可获：' + station.side.rewardText + '</span></div>'
+    );
+    openModal({
+      kicker: '可选支线 · ' + station.name,
+      title: station.side.title,
+      body,
+      closable: true,
+      actions: [
+        {
+          label: station.side.help,
+          className: 'btn-primary',
+          onClick: () => completeSide(station)
+        },
+        { label: '继续赶路', className: 'btn-ghost', onClick: () => closeModal() }
+      ]
+    });
+  }
+
+  function completeSide(station) {
+    if (state.sideDone.includes(station.id)) return;
+    state.sideDone.push(station.id);
+    const reward = station.side.reward || {};
+    let grantText = station.side.rewardText;
+    if (reward.troops || reward.food || reward.ammo) {
+      applyResourceDelta({ troops: reward.troops || 0, food: reward.food || 0, ammo: reward.ammo || 0 }, { float: false });
+    }
+    if (reward.ammoGuard) {
+      state.buffs.ammoGuard += reward.ammoGuard;
+      grantText = '后续弹药消耗 -' + reward.ammoGuard;
+    }
+    if (reward.snowResist) {
+      state.buffs.snowResist = true;
+      grantText = '雪山危险地形消耗速度降低';
+    }
+    saveState();
+    updateHUD();
+    const body = (
+      '<div class="result-banner correct"><strong>支线完成</strong><span>' + grantText + '</span></div>' +
+      '<p>' + station.side.result + '</p>' +
+      '<p class="source-line">' + station.side.source + '</p>'
+    );
+    openModal({
+      kicker: '支线记录 · ' + station.side.theme,
+      title: station.side.title,
+      body,
+      closable: true,
+      actions: [{ label: '继续探索', className: 'btn-primary', onClick: () => closeModal() }]
+    });
+  }
+
+  /* ------------------ 收集品与背包 ------------------ */
+  function collectItem(station, item) {
+    if (state.collected.includes(item.id)) return;
+    state.collected.push(item.id);
+    saveState();
+    renderBag();
+    const body = (
+      '<div class="section-label">' + item.kind + '</div>' +
+      '<div class="quote">' + item.text + '</div>' +
+      '<p class="small">已自动收入史料背包，可随时回看。</p>' +
+      '<p class="source-line">' + item.source + '</p>'
+    );
+    openModal({
+      kicker: '史料收集 · ' + station.name,
+      title: item.title,
+      body,
+      closable: true,
+      actions: [{ label: '收入背包', className: 'btn-primary', onClick: () => closeModal() }]
+    });
+  }
+
+  function openBagItem(item) {
+    if (!item) return;
+    const body = (
+      '<div class="section-label">' + item.kind + ' · ' + item.stationName + '</div>' +
+      '<div class="quote">' + item.text + '</div>' +
+      '<p class="source-line">' + item.source + '</p>'
+    );
+    openModal({
+      kicker: '史料背包',
+      title: item.title,
+      body,
+      closable: true,
+      actions: [{ label: '合上史料', className: 'btn-ghost', onClick: () => closeModal() }]
+    });
+  }
+
+  /* ------------------ 会师、失败、说明 ------------------ */
+  function showVictory(review) {
+    if (!allBeforeDone(6)) return;
+    const first = !state.finished;
+    state.finished = true;
+    state.mainDone[6] = true;
+    saveState();
+    renderTimeline();
+    updateHUD();
+    const compare = state.res.troops >= 7000
+      ? '你的推演保留了 ' + fmt.format(state.res.troops) + ' 名兵员，与史实到达陕北的约 7,000 人形成了对照。'
+      : '你的推演只剩 ' + fmt.format(state.res.troops) + ' 名兵员。真实历史中，红军在付出极其惨重的牺牲后，到达陕北时约 7,000 人。';
+    const body = (
+      '<div class="victory-star" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 2.2l3 6.7 7.3.8-5.5 5 1.5 7.1L12 18.2 5.7 21.8l1.5-7.1-5.5-5 7.3-.8z"/></svg></div>' +
+      '<h3 class="ending-title">1936年10月，三大主力红军胜利会师</h3>' +
+      '<p>红一、红二、红四方面军在甘肃会宁、静宁将台堡等地胜利会师，长征宣告结束。二万五千里征途，翻越的是雪山草地，也是中国革命最艰难的岁月。</p>' +
+      '<div class="ending-stats">' +
+        '<div class="ending-stat"><span>最终兵员</span><strong>' + fmt.format(state.res.troops) + '</strong><small> 人</small></div>' +
+        '<div class="ending-stat"><span>剩余粮食</span><strong>' + fmt.format(state.res.food) + '</strong><small> 份</small></div>' +
+        '<div class="ending-stat"><span>剩余弹药</span><strong>' + fmt.format(state.res.ammo) + '</strong><small> 发</small></div>' +
+      '</div>' +
+      '<p class="small"><strong>真实历史：</strong>中央红军出发时约8.6万人，到达陕北时约7,000人。' + compare + '</p>' +
+      '<div class="spirit-box"><strong>长征精神</strong><br>把全国人民和中华民族的根本利益看得高于一切，坚定革命的理想和信念，坚信正义事业必然胜利；为了救国救民，不怕任何艰难险阻，不惜付出一切牺牲；坚持独立自主、实事求是，一切从实际出发；顾全大局、严守纪律、紧密团结；紧紧依靠人民群众，同人民群众生死相依、患难与共、艰苦奋斗。</div>' +
+      '<p class="source-line">画面为教学示意。重大历史事件依据《中国共产党简史》、中央党史和文献研究院公开资料。</p>'
+    );
+    openModal({
+      kicker: '终点 · 长征胜利结束',
+      title: first ? '胜利会师' : '会师复盘',
+      body,
+      wide: true,
+      closable: true,
+      actions: [
+        { label: '继续探索', className: 'btn-primary', onClick: () => closeModal() },
+        { label: '重新开始', className: 'btn-ghost', onClick: () => confirmReset() }
+      ]
+    });
+    game.victoryZone = true;
+  }
+
+  function failGame(reason) {
+    if (game.failed || state.finished) return;
+    game.failed = true;
+    game.paused = true;
+    game.keys.clear();
+    const body = (
+      '<div class="result-banner wrong"><strong>推演失败</strong><span>' + reason + '</span></div>' +
+      '<p>长征的胜利，是在极端困难的条件下取得的。资源耗尽后，推演无法继续，但你可以回到最近抵达的站点重整，或重新走一遍这条路。</p>' +
+      '<div class="ending-stats">' +
+        '<div class="ending-stat"><span>兵员</span><strong>' + fmt.format(state.res.troops) + '</strong><small> 人</small></div>' +
+        '<div class="ending-stat"><span>粮食</span><strong>' + fmt.format(state.res.food) + '</strong><small> 份</small></div>' +
+        '<div class="ending-stat"><span>弹药</span><strong>' + fmt.format(state.res.ammo) + '</strong><small> 发</small></div>' +
+      '</div>' +
+      '<p class="source-line">推演数值为教学互动数据，不等同于精确战史统计。</p>'
+    );
+    const actions = [];
+    if (state.checkpoint) {
+      actions.push({ label: '从最近站点重整', className: 'btn-primary', onClick: () => restoreCheckpoint() });
+    }
+    actions.push({ label: '重新开始', className: 'btn-danger', onClick: () => resetGame() });
+    openModal({
+      kicker: '失败复盘',
+      title: '部队已无力继续行军',
+      body,
+      wide: true,
+      closable: false,
+      actions
+    });
+  }
+
+  function restoreCheckpoint() {
+    if (!state.checkpoint) return;
+    state.res = {
+      troops: clamp(state.checkpoint.res.troops, 1, MAX_RES.troops),
+      food: clamp(state.checkpoint.res.food, 1, MAX_RES.food),
+      ammo: clamp(state.checkpoint.res.ammo, 1, MAX_RES.ammo)
+    };
+    state.player.x = state.checkpoint.x;
+    state.player.y = state.checkpoint.y;
+    state.player.dir = 'down';
+    if (!canStandAt(state.player.x, state.player.y)) {
+      const fallback = STATIONS[currentStationId()].spawn;
+      state.player.x = fallback.x;
+      state.player.y = fallback.y;
+    }
+    game.failed = false;
+    game.paused = false;
+    game.displayed = { ...state.res };
+    game.hazardAccum = 0;
+    game.lastArea = null;
+    game.mainZone = null;
+    game.sideZone = null;
+    game.victoryZone = false;
+    closeModal(true);
+    renderAllUI();
+    updateCamera(0, true);
+    saveState();
+    showAreaBanner(STATIONS[currentStationId()]);
+    showToast('已回到' + state.checkpoint.label + ' · 资源恢复到进入该站时的状态', 3000);
+  }
+
+  function openHelp() {
+    const body = (
+      '<p class="lead">你是指挥员，也是这支队伍中的普通一员。沿长征真实路线前进，在每一站探索、抉择、收集史料。</p>' +
+      '<div class="help-grid">' +
+        '<div class="help-box"><strong>移动</strong><span class="help-key">W</span> <span class="help-key">A</span> <span class="help-key">S</span> <span class="help-key">D</span> 或方向键。点击画面后即可使用键盘；触屏设备使用左下方向键。</div>' +
+        '<div class="help-box"><strong>调查</strong><span class="help-key">E</span> 或走近目标。发光的纸条、日记会自动触发阅读；红旗地标触发主线抉择。</div>' +
+        '<div class="help-box"><strong>时序解锁</strong>完成当前站点主线，才会解除通往下一站的地形封锁。未解锁区域无法提前进入。</div>' +
+        '<div class="help-box"><strong>危险地形</strong>雪山和沼泽会持续消耗粮食与兵员。沿主路走更安全，深入探索要留意资源。</div>' +
+      '</div>' +
+      '<div class="legend-list">' +
+        '<span><i class="legend-dot red"></i>红旗地标：主线事件</span>' +
+        '<span><i class="legend-dot gold"></i>闪光物：史料收集品</span>' +
+        '<span><i class="legend-dot paper"></i>人影：可选支线</span>' +
+        '<span><i class="legend-dot lock"></i>封锁线：尚未解锁</span>' +
+        '<span><i class="legend-dot snow"></i>雪地：持续消耗</span>' +
+        '<span><i class="legend-dot marsh"></i>沼泽：持续消耗</span>' +
+      '</div>' +
+      '<p class="small">支线在探索过程中按概率出现，不是进入站点就立刻弹出。支线不完成不影响主线。进度自动保存在本机。</p>'
+    );
+    openModal({
+      kicker: '行军手册',
+      title: '怎样走完长征',
+      body,
+      closable: true,
+      actions: [{ label: '开始行军', className: 'btn-primary', onClick: () => closeModal() }]
+    });
+  }
+
+  function openSourceInfo() {
+    const body = (
+      '<p class="lead">这是一件课程思政实践作品，历史事件、时间线与主线抉择均按权威党史表述设置；日记、纸条和支线为据公开史料综合改写的教学文本。</p>' +
+      '<p class="small">地图为教学示意，路线与地形不按精确地理比例绘制。</p>' +
+      '<div class="section-label">重大历史表述</div>' +
+      '<p class="small">主线依据《中国共产党简史》、中央党史和文献研究院公开资料。湘江战役表述为中央红军长征途中突破的第四道封锁线；1936年10月，红一、红二、红四方面军在甘肃会宁、静宁将台堡等地胜利会师。</p>' +
+      '<div class="section-label">日记与纸条</div>' +
+      '<p class="small">这些文本参考公开出版的长征日记、亲历者回忆和党史材料，为适合网页叙事的教学改写，不是逐字原文，也不虚构新的历史事件。页面中每条史料均标注“教学改写”。</p>' +
+      '<div class="section-label">支线故事</div>' +
+      '<p class="small">支线围绕军民鱼水情、战友情、坚守信念和不畏艰苦，取材于长征期间群众支援红军、红军互相救护的公开史料，并作情境化综合改写。</p>' +
+      '<p class="source-line">主要参考：《中国共产党简史》、中央党史和文献研究院公开党史资料、公开出版的长征日记与长征亲历者回忆。</p>'
+    );
+    openModal({
+      kicker: '史料说明',
+      title: '怎样理解这些文字',
+      body,
+      closable: true,
+      actions: [{ label: '知道了', className: 'btn-primary', onClick: () => closeModal() }]
+    });
+  }
+
+  function confirmReset() {
+    openModal({
+      kicker: '重新开始',
+      title: '要重新走一遍长征吗？',
+      body: '<p>当前资源、通关进度、已收集史料和支线记录都会被清空，页面将回到1934年10月的瑞金。此操作不可撤销。</p>',
+      closable: true,
+      actions: [
+        { label: '确认重置', className: 'btn-danger', onClick: () => { closeModal(true); resetGame(); } },
+        { label: '取消', className: 'btn-ghost', onClick: () => closeModal() }
+      ]
+    });
+  }
+
+  function resetGame() {
+    closeModal(true);
+    try { window.localStorage.removeItem(SAVE_KEY); } catch (error) { game.storageOK = false; }
+    state = freshState();
+    game.failed = false;
+    game.paused = false;
+    game.modalOpen = false;
+    game.displayed = { ...INITIAL_RES };
+    game.lastArea = null;
+    game.mainZone = null;
+    game.sideZone = null;
+    game.victoryZone = false;
+    game.hazardAccum = 0;
+    game.floats = [];
+    game.lastGateHint = 0;
+    game.interactionCooldown = performance.now() + 500;
+    updateCamera(0, true);
+    renderAllUI();
+    updateStorageNote();
+    scheduleSave();
+    showToast('长征推演已重置 · 从瑞金重新出发', 3000);
+    updateAreaAndHud(true);
+  }
+
+  /* =====================================================
+     十、Canvas 绘制
+     ===================================================== */
+  function screenX(x) { return x - game.camera.x; }
+  function screenY(y) { return y - game.camera.y; }
+  function inView(x, y, margin) {
+    const m = margin || 90;
+    return x > -m && y > -m && x < game.view.w + m && y < game.view.h + m;
+  }
+
+  function drawWaterAnimation(time) {
+    const startX = Math.max(0, Math.floor(game.camera.x / TILE) - 1);
+    const endX = Math.min(COLS - 1, Math.ceil((game.camera.x + game.view.w) / TILE) + 1);
+    const startY = Math.max(0, Math.floor(game.camera.y / TILE) - 1);
+    const endY = Math.min(ROWS - 1, Math.ceil((game.camera.y + game.view.h) / TILE) + 1);
+    ctx.save();
+    for (let ty = startY; ty <= endY; ty += 1) {
+      for (let tx = startX; tx <= endX; tx += 1) {
+        if (TYPES[TILE_INDEX(tx, ty)] !== TYPE.WATER) continue;
+        const x = tx * TILE - game.camera.x;
+        const y = ty * TILE - game.camera.y;
+        const phase = hash2(tx, ty) * 6.28;
+        ctx.strokeStyle = 'rgba(202,228,221,' + (0.10 + Math.sin(time * 1.3 + phase) * 0.035) + ')';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        const yy = y + 12 + Math.sin(time * 1.3 + phase) * 2;
+        ctx.moveTo(x + 4, yy);
+        ctx.quadraticCurveTo(x + 12, yy - 3, x + 20, yy);
+        ctx.quadraticCurveTo(x + 26, yy + 3, x + 31, yy);
+        ctx.stroke();
+      }
+    }
+    ctx.restore();
+  }
+
+  function drawFlagWave(x, y, time, phase) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.strokeStyle = '#5a4128';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(0, 14);
+    ctx.lineTo(0, -34);
+    ctx.stroke();
+    ctx.fillStyle = '#8b1713';
+    ctx.beginPath();
+    ctx.moveTo(1, -34);
+    const wave = Math.sin(time * 3 + phase) * 3;
+    ctx.quadraticCurveTo(16, -37 + wave, 31, -30 + wave);
+    ctx.lineTo(31, -15 + wave);
+    ctx.quadraticCurveTo(15, -22 - wave, 1, -19);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = 'rgba(226,199,143,.85)';
+    ctx.beginPath();
+    ctx.arc(15, -25 + wave * 0.4, 2.2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function drawCampfire(x, y, time) {
+    const flicker = 0.82 + Math.sin(time * 9.7) * 0.12 + Math.sin(time * 6.1) * 0.06;
+    const glow = ctx.createRadialGradient(x, y, 0, x, y, 31);
+    glow.addColorStop(0, 'rgba(232,148,71,.22)');
+    glow.addColorStop(1, 'rgba(232,148,71,0)');
+    ctx.fillStyle = glow;
+    ctx.beginPath();
+    ctx.arc(x, y, 31, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(72,48,29,.8)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(x - 8, y + 5);
+    ctx.lineTo(x + 7, y + 1);
+    ctx.moveTo(x - 7, y + 1);
+    ctx.lineTo(x + 8, y + 6);
+    ctx.stroke();
+    ctx.fillStyle = '#d47a3d';
+    ctx.beginPath();
+    ctx.moveTo(x, y - 10 * flicker);
+    ctx.quadraticCurveTo(x + 7, y - 1, x + 2, y + 2);
+    ctx.quadraticCurveTo(x - 3, y - 1, x, y - 10 * flicker);
+    ctx.fill();
+    ctx.fillStyle = '#f0c372';
+    ctx.beginPath();
+    ctx.moveTo(x - 1, y - 4 * flicker);
+    ctx.quadraticCurveTo(x + 3, y + 1, x, y + 2);
+    ctx.quadraticCurveTo(x - 2, y - 1, x - 1, y - 4 * flicker);
+    ctx.fill();
+  }
+
+  function drawCollectible(st, item, time) {
+    if (state.collected.includes(item.id)) return;
+    const p = itemPosition(st, item);
+    const sx = screenX(p.x);
+    const sy = screenY(p.y);
+    if (!inView(sx, sy, 50)) return;
+    const bob = Math.sin(time * 2.8 + p.x * 0.02) * 3;
+    const pulse = 0.62 + Math.sin(time * 3.2 + p.y * 0.01) * 0.2;
+    const glow = ctx.createRadialGradient(sx, sy + bob, 0, sx, sy + bob, 24);
+    glow.addColorStop(0, 'rgba(239,211,146,' + (0.32 * pulse) + ')');
+    glow.addColorStop(1, 'rgba(239,211,146,0)');
+    ctx.fillStyle = glow;
+    ctx.beginPath();
+    ctx.arc(sx, sy + bob, 24, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.save();
+    ctx.translate(sx, sy + bob);
+    ctx.rotate(-0.08);
+    ctx.fillStyle = '#f5e9d1';
+    ctx.fillRect(-7, -9, 14, 18);
+    ctx.strokeStyle = 'rgba(122,82,42,.65)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(-7, -9, 14, 18);
+    ctx.strokeStyle = 'rgba(122,82,42,.4)';
+    ctx.beginPath();
+    ctx.moveTo(-4, -4); ctx.lineTo(4, -4);
+    ctx.moveTo(-4, 0); ctx.lineTo(4, 0);
+    ctx.moveTo(-4, 4); ctx.lineTo(2, 4);
+    ctx.stroke();
+    ctx.restore();
+    const twinkle = 0.5 + Math.sin(time * 4 + p.x) * 0.5;
+    ctx.strokeStyle = 'rgba(247,224,174,' + (0.4 + twinkle * 0.5) + ')';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(sx + 11, sy - 13 + bob); ctx.lineTo(sx + 11, sy - 5 + bob);
+    ctx.moveTo(sx + 7, sy - 9 + bob); ctx.lineTo(sx + 15, sy - 9 + bob);
+    ctx.stroke();
+  }
+
+  function drawSideMarker(st, time) {
+    if (state.sideDone.includes(st.id)) return;
+    const p = sidePosition(st);
+    const sx = screenX(p.x);
+    const sy = screenY(p.y);
+    if (!inView(sx, sy, 60)) return;
+    const bob = Math.sin(time * 2.1 + st.id) * 1.5;
+    ctx.save();
+    ctx.globalAlpha = 0.68;
+    ctx.fillStyle = 'rgba(49,58,43,.8)';
+    ctx.beginPath();
+    ctx.arc(sx, sy - 10 + bob, 4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillRect(sx - 4, sy - 5 + bob, 8, 11);
+    ctx.fillStyle = 'rgba(60,70,51,.8)';
+    ctx.fillRect(sx - 4, sy + 6 + bob, 3, 7);
+    ctx.fillRect(sx + 1, sy + 6 + bob, 3, 7);
+    ctx.strokeStyle = 'rgba(200,163,91,.45)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(sx, sy - 12 + bob, 13, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.fillStyle = 'rgba(242,224,184,.72)';
+    ctx.font = '9px "Noto Serif SC","Songti SC",serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('?', sx, sy - 27 + bob);
+    ctx.restore();
+  }
+
+  function drawMainMarker(st, time) {
+    if (state.mainDone[st.id]) return;
+    if (st.id === 6 && !allBeforeDone(6)) return;
+    if (st.id < 6 && !stationUnlocked(st.id)) return;
+    const sx = screenX(st.x);
+    const sy = screenY(st.y);
+    if (!inView(sx, sy, 90)) return;
+    const pulse = 0.5 + Math.sin(time * 2.6) * 0.5;
+    ctx.save();
+    ctx.strokeStyle = 'rgba(217,177,98,' + (0.27 + pulse * 0.32) + ')';
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    ctx.arc(sx, sy, 31 + pulse * 8, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.fillStyle = 'rgba(200,163,91,.9)';
+    ctx.beginPath();
+    ctx.moveTo(sx, sy - 56);
+    ctx.lineTo(sx + 4, sy - 50);
+    ctx.lineTo(sx, sy - 44);
+    ctx.lineTo(sx - 4, sy - 50);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = 'rgba(242,227,192,.78)';
+    ctx.font = '8px "PingFang SC","Microsoft YaHei",sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('主线', sx, sy - 61);
+    ctx.restore();
+  }
+
+  function drawStationsDynamic(time) {
+    STATIONS.forEach((st) => {
+      if (!stationUnlocked(st.id)) return;
+      const sx = screenX(st.x);
+      const sy = screenY(st.y);
+      if (!inView(sx, sy, 170)) return;
+      drawMainMarker(st, time);
+      drawFlagWave(sx - 2, sy - 52, time, st.id * 1.7);
+      if (st.id === 0) drawCampfire(sx + 82, sy + 62, time);
+      if (st.id === 6) drawCampfire(sx - 84, sy + 67, time);
+      st.collectibles.forEach((item) => drawCollectible(st, item, time));
+      drawSideMarker(st, time);
+    });
+  }
+
+  function drawGate(gate, time) {
+    if (!state) return;
+    const sx = screenX(gate.x);
+    const sy = screenY(gate.y);
+    if (!inView(sx, sy, 220)) return;
+    const open = Boolean(state.mainDone[gate.after]);
+    const x1 = sx - gate.dx;
+    const y1 = sy - gate.dy;
+    const x2 = sx + gate.dx;
+    const y2 = sy + gate.dy;
+    ctx.save();
+    ctx.lineCap = 'round';
+    if (open) {
+      ctx.strokeStyle = 'rgba(94,68,40,.62)';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.moveTo(x2, y2);
+      ctx.stroke();
+      ctx.fillStyle = 'rgba(111,87,56,.85)';
+      ctx.beginPath(); ctx.arc(x1, y1, 3, 0, Math.PI * 2); ctx.arc(x2, y2, 3, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+      return;
+    }
+    ctx.strokeStyle = 'rgba(47,31,18,.72)';
+    ctx.lineWidth = 5;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+    ctx.strokeStyle = '#7a5a36';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+    const posts = [
+      [x1, y1], [x2, y2],
+      [x1 + (x2 - x1) * 0.27, y1 + (y2 - y1) * 0.27],
+      [x1 + (x2 - x1) * 0.73, y1 + (y2 - y1) * 0.73]
+    ];
+    posts.forEach(([px, py], i) => {
+      ctx.fillStyle = i % 2 ? '#5f4328' : '#6b4c2d';
+      ctx.fillRect(px - 2.5, py - 8, 5, 16);
+      ctx.fillStyle = 'rgba(221,190,135,.35)';
+      ctx.fillRect(px - 2, py - 7, 1, 12);
+    });
+    ctx.fillStyle = '#8b1713';
+    ctx.beginPath();
+    ctx.moveTo(sx - 14, sy - 3);
+    ctx.lineTo(sx + 15, sy - 3);
+    ctx.lineTo(sx + 10, sy + 8);
+    ctx.lineTo(sx - 9, sy + 8);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = 'rgba(242,224,185,.84)';
+    ctx.font = '8px "PingFang SC","Microsoft YaHei",sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('封锁', sx, sy + 20);
+    ctx.restore();
+  }
+
+  function drawLockedFog(time) {
+    if (!state) return;
+    const locked = GATES.find((gate) => !state.mainDone[gate.after]);
+    if (!locked) return;
+    const sx = screenX(locked.x);
+    if (sx > game.view.w + 40) return;
+    const start = Math.max(0, sx - 23);
+    const gradient = ctx.createLinearGradient(start, 0, start + 160, 0);
+    gradient.addColorStop(0, 'rgba(17,14,10,.18)');
+    gradient.addColorStop(0.25, 'rgba(17,14,10,.56)');
+    gradient.addColorStop(1, 'rgba(17,14,10,.76)');
+    ctx.save();
+    ctx.fillStyle = gradient;
+    ctx.fillRect(start, 0, game.view.w - start, game.view.h);
+    ctx.globalAlpha = 0.08;
+    ctx.strokeStyle = '#d7c49b';
+    ctx.lineWidth = 1;
+    for (let i = -game.view.h; i < game.view.w - start + game.view.h; i += 26) {
+      ctx.beginPath();
+      ctx.moveTo(start + i + (time * 4) % 26, 0);
+      ctx.lineTo(start + i - game.view.h + (time * 4) % 26, game.view.h);
+      ctx.stroke();
+    }
+    ctx.restore();
+    const labelX = clamp(sx + 82, 82, game.view.w - 82);
+    if (labelX > 20 && labelX < game.view.w - 20) {
+      ctx.save();
+      ctx.fillStyle = 'rgba(234,218,187,.52)';
+      ctx.font = '9px "PingFang SC","Microsoft YaHei",sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('长征尚未行进至此', labelX, clamp(screenY(locked.y) + 68, 36, game.view.h - 30));
+      ctx.restore();
+    }
+  }
+
+  function drawPlayer(time) {
+    const p = state.player;
+    const sx = screenX(p.x);
+    const sy = screenY(p.y);
+    const moving = game.moving;
+    const swing = moving ? Math.sin(game.walkTime * 12) : 0;
+    const bob = moving ? Math.abs(Math.sin(game.walkTime * 12)) * 1.4 : Math.sin(time * 2.1) * 0.5;
+    ctx.save();
+    ctx.translate(sx, sy);
+    ctx.fillStyle = 'rgba(10,9,6,.28)';
+    ctx.beginPath();
+    ctx.ellipse(0, 11, 11, 4, 0, 0, Math.PI * 2);
+    ctx.fill();
+    if (p.dir === 'left') ctx.scale(-1, 1);
+
+    // 双腿与鞋
+    ctx.fillStyle = '#343a32';
+    ctx.fillRect(-6, 5 + swing * 2, 4, 9);
+    ctx.fillRect(2, 5 - swing * 2, 4, 9);
+    ctx.fillStyle = '#211f1a';
+    ctx.fillRect(-7, 12 + swing * 2, 5, 3);
+    ctx.fillRect(2, 12 - swing * 2, 5, 3);
+
+    // 背包
+    ctx.fillStyle = '#6b5438';
+    ctx.fillRect(-9, -2 - bob, 5, 10);
+    ctx.fillStyle = '#8b704b';
+    ctx.fillRect(-8, -1 - bob, 3, 7);
+
+    // 军装与腰带
+    ctx.fillStyle = '#566451';
+    ctx.fillRect(-7, -7 - bob, 14, 14);
+    ctx.fillStyle = '#414d3e';
+    ctx.fillRect(-7, 1 - bob, 14, 2);
+    ctx.fillStyle = '#b58f54';
+    ctx.fillRect(-1.5, 0 - bob, 3, 3);
+
+    // 手臂
+    ctx.fillStyle = '#4b5948';
+    ctx.fillRect(-10, -4 - bob + swing * 1.5, 3, 9);
+    ctx.fillRect(7, -4 - bob - swing * 1.5, 3, 9);
+    ctx.fillStyle = '#d4a982';
+    ctx.fillRect(-10, 5 - bob + swing * 1.5, 3, 3);
+    ctx.fillRect(7, 5 - bob - swing * 1.5, 3, 3);
+
+    // 头、军帽
+    ctx.fillStyle = '#d6aa82';
+    ctx.beginPath();
+    ctx.arc(0, -12 - bob, 5.2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#5e6a55';
+    ctx.beginPath();
+    ctx.arc(0, -14 - bob, 6, Math.PI, Math.PI * 2);
+    ctx.fill();
+    ctx.fillRect(-6, -14.5 - bob, 12, 2.3);
+    ctx.fillStyle = '#8b1713';
+    ctx.beginPath();
+    ctx.arc(0, -14.8 - bob, 1.7, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 面朝方向的小细节
+    if (p.dir === 'down' || p.dir === 'left' || p.dir === 'right') {
+      ctx.fillStyle = 'rgba(76,48,30,.8)';
+      ctx.fillRect(-2, -12.6 - bob, 1, 1);
+      ctx.fillRect(1.5, -12.6 - bob, 1, 1);
+    } else {
+      ctx.fillStyle = '#4c5a47';
+      ctx.fillRect(-5, -12 - bob, 10, 5);
+    }
+    ctx.restore();
+  }
+
+  function drawAtmosphere(time) {
+    const cameraLeft = game.camera.x;
+    const cameraRight = game.camera.x + game.view.w;
+
+    // 夹金山飘雪
+    if (cameraRight > 3150 && cameraLeft < 3940) {
+      if (!game.snow.length) {
+        for (let i = 0; i < 115; i += 1) {
+          game.snow.push({
+            x: Math.random(),
+            y: Math.random(),
+            speed: 17 + Math.random() * 34,
+            size: 0.7 + Math.random() * 1.8,
+            drift: 5 + Math.random() * 16,
+            phase: Math.random() * 6.28
+          });
+        }
+      }
+      ctx.save();
+      game.snow.forEach((flake) => {
+        const x = ((flake.x * game.view.w + Math.sin(time * 0.8 + flake.phase) * flake.drift + time * 6) % (game.view.w + 30)) - 15;
+        const y = ((flake.y * game.view.h + time * flake.speed) % (game.view.h + 20)) - 10;
+        ctx.fillStyle = 'rgba(247,250,246,' + (0.22 + flake.size * 0.12) + ')';
+        ctx.beginPath();
+        ctx.arc(x, y, flake.size, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      ctx.restore();
+    }
+
+    // 松潘草地薄雾
+    if (cameraRight > 3920 && cameraLeft < 4670) {
+      ctx.save();
+      for (let i = 0; i < 9; i += 1) {
+        const x = ((time * (5 + i * 0.6) + i * 190) % (game.view.w + 300)) - 150;
+        const y = 80 + (i * 73) % Math.max(120, game.view.h - 120) + Math.sin(time * 0.4 + i) * 8;
+        const grad = ctx.createRadialGradient(x, y, 0, x, y, 120);
+        grad.addColorStop(0, 'rgba(222,227,212,.07)');
+        grad.addColorStop(1, 'rgba(222,227,212,0)');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.ellipse(x, y, 150, 48, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+  }
+
+  function drawFloatingTexts() {
+    game.floats.forEach((f) => {
+      const sx = screenX(f.x);
+      const sy = screenY(f.y);
+      const alpha = clamp(f.life / f.maxLife, 0, 1);
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.font = '9px "PingFang SC","Microsoft YaHei",sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = 'rgba(20,12,7,.75)';
+      ctx.fillText(f.text, sx + 1, sy + 1);
+      ctx.fillStyle = f.color;
+      ctx.fillText(f.text, sx, sy);
+      ctx.restore();
+    });
+  }
+
+  function drawObjectiveArrow(time) {
+    if (!state || state.finished) return;
+    const target = STATIONS[currentStationId()];
+    const tx = screenX(target.x);
+    const ty = screenY(target.y);
+    const margin = 42;
+    if (tx > margin && tx < game.view.w - margin && ty > margin && ty < game.view.h - margin) return;
+    const cx = game.view.w / 2;
+    const cy = game.view.h / 2;
+    let dx = target.x - state.player.x;
+    let dy = target.y - state.player.y;
+    const angle = Math.atan2(dy, dx);
+    const ex = clamp(tx, margin, game.view.w - margin);
+    const ey = clamp(ty, margin, game.view.h - margin);
+    ctx.save();
+    ctx.translate(ex, ey);
+    ctx.rotate(angle);
+    ctx.fillStyle = 'rgba(217,177,98,.9)';
+    ctx.beginPath();
+    ctx.moveTo(13, 0);
+    ctx.lineTo(-7, -7);
+    ctx.lineTo(-3, 0);
+    ctx.lineTo(-7, 7);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+    ctx.save();
+    ctx.fillStyle = 'rgba(242,226,193,.65)';
+    ctx.font = '8px "PingFang SC","Microsoft YaHei",sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('主线', ex, ey + 18);
+    ctx.restore();
+  }
+
+  function drawFrame(time) {
+    if (!state) return;
+    const w = game.view.w;
+    const h = game.view.h;
+    ctx.clearRect(0, 0, w, h);
+    const sx = Math.round(game.camera.x);
+    const sy = Math.round(game.camera.y);
+    ctx.drawImage(worldCanvas, sx, sy, w, h, 0, 0, w, h);
+    drawWaterAnimation(time);
+    drawStationsDynamic(time);
+    drawLockedFog(time);
+    GATES.forEach((gate) => drawGate(gate, time));
+    drawPlayer(time);
+    drawAtmosphere(time);
+    drawFloatingTexts();
+    drawObjectiveArrow(time);
+  }
+
+  /* =====================================================
+     十一、更新循环与初始化
+     ===================================================== */
+  function updateFloats(dt) {
+    for (let i = game.floats.length - 1; i >= 0; i -= 1) {
+      const f = game.floats[i];
+      f.life -= dt;
+      f.y -= 13 * dt;
+      if (f.life <= 0) game.floats.splice(i, 1);
+    }
+  }
+
+  function validateLoadedPosition() {
+    if (!state) return;
+    const locked = GATES.find((gate) => !state.mainDone[gate.after]);
+    const pastLockedGate = locked && state.player.x > locked.x + 24;
+    if (pastLockedGate || !canStandAt(state.player.x, state.player.y)) {
+      const idx = currentStationId();
+      const st = STATIONS[idx];
+      state.player.x = st.spawn.x;
+      state.player.y = st.spawn.y;
+      state.player.dir = 'down';
+    }
+  }
+
+  function init() {
+    // 弹窗移出画布容器，避免被 overflow 裁剪，并确保能覆盖整个页面
+    const modalLayer = $('modalLayer');
+    if (modalLayer && modalLayer.parentElement !== document.body) document.body.appendChild(modalLayer);
+    buildWorld();
+    state = loadState();
+    validateLoadedPosition();
+    game.displayed = { ...state.res };
+    resizeCanvas();
+    updateCamera(0, true);
+    renderAllUI();
+    bindEvents();
+    game.paused = false;
+    game.lastFrame = performance.now();
+    game.time = 0;
+    updateAreaAndHud(true);
+    updateInteractionPrompt();
+    window.setTimeout(() => $('bootScreen').classList.add('hide'), 450);
+    window.setTimeout(() => {
+      if (state.res.troops <= 0 || state.res.food <= 0 || state.res.ammo <= 0) {
+        failGame(state.res.troops <= 0 ? '兵员耗尽，部队已无法继续行军。' : state.res.food <= 0 ? '粮食耗尽，部队已无法继续行军。' : '弹药耗尽，部队已无法继续执行任务。');
+      }
+    }, 700);
+    window.setInterval(() => { if (!game.modalOpen && !game.failed) saveState(); }, 4500);
+    window.addEventListener('beforeunload', saveState);
+    window.addEventListener('pagehide', saveState);
+    requestAnimationFrame(loop);
+  }
+
+  function loop(now) {
+    const dt = Math.min(0.05, Math.max(0, (now - game.lastFrame) / 1000 || 0));
+    game.lastFrame = now;
+    game.time = now / 1000;
+    if (!game.paused && !game.failed && !game.modalOpen) {
+      updateMovement(dt);
+      updateAreaAndHud(false);
+      updateHazard(dt);
+      updateInteractions();
+      updateInteractionPrompt();
+    }
+    updateFloats(dt);
+    updateCamera(dt, false);
+    drawFrame(game.time);
+    requestAnimationFrame(loop);
+  }
+
+  function handleDirectionKey(down, event) {
+    const active = document.activeElement;
+    if (active && /^(BUTTON|INPUT|TEXTAREA|SELECT|A)$/.test(active.tagName)) return false;
+    const key = event.key.toLowerCase();
+    const map = {
+      arrowup: 'up', w: 'up', arrowdown: 'down', s: 'down',
+      arrowleft: 'left', a: 'left', arrowright: 'right', d: 'right'
+    };
+    if (!map[key] && key !== 'shift' && key !== 'e' && key !== 'enter') return false;
+    if (game.modalOpen) return false;
+    if (map[key]) {
+      event.preventDefault();
+      if (down) game.keys.add(key);
+      else game.keys.delete(key);
+      return true;
+    }
+    if (key === 'shift') {
+      if (down) game.keys.add('shift'); else game.keys.delete('shift');
+      return true;
+    }
+    if (down && (key === 'e' || key === 'enter')) {
+      event.preventDefault();
+      interact();
+      return true;
+    }
+    return false;
+  }
+
+  function bindEvents() {
+    $('helpBtn').addEventListener('click', openHelp);
+    $('sideHelpBtn').addEventListener('click', openHelp);
+    $('soundlessInfo').addEventListener('click', openSourceInfo);
+    $('resetBtn').addEventListener('click', confirmReset);
+    $('sideResetBtn').addEventListener('click', confirmReset);
+    $('reviewBtn').addEventListener('click', () => showVictory(true));
+    $('touchInteract').addEventListener('click', interact);
+    $('bagList').addEventListener('click', (event) => {
+      const btn = event.target.closest('[data-item-id]');
+      if (!btn) return;
+      const item = ALL_ITEMS.find((entry) => entry.id === btn.dataset.itemId);
+      openBagItem(item);
+    });
+    canvas.addEventListener('click', () => canvas.focus({ preventScroll: true }));
+
+    window.addEventListener('keydown', (event) => {
+      if (game.modalOpen) {
+        if (event.key === 'Escape') {
+          const close = $('modalClose');
+          if (!close.hidden) close.click();
+        }
+        if (event.key === 'Tab') {
+          const focusable = [...$('modalLayer').querySelectorAll('button:not([hidden]), [href], [tabindex]:not([tabindex="-1"])')]
+            .filter((el) => !el.disabled && el.offsetParent !== null);
+          if (focusable.length) {
+            const first = focusable[0];
+            const last = focusable[focusable.length - 1];
+            if (event.shiftKey && document.activeElement === first) {
+              event.preventDefault();
+              last.focus();
+            } else if (!event.shiftKey && document.activeElement === last) {
+              event.preventDefault();
+              first.focus();
+            }
+          }
+        }
+        return;
+      }
+      handleDirectionKey(true, event);
+    });
+
+    window.addEventListener('keyup', (event) => {
+      if (!game.modalOpen) handleDirectionKey(false, event);
+    });
+
+    window.addEventListener('blur', () => {
+      game.keys.clear();
+      game.touchDirs.clear();
+    });
+
+    document.querySelectorAll('.touch-controls [data-dir]').forEach((btn) => {
+      const dir = btn.dataset.dir;
+      const press = (event) => {
+        event.preventDefault();
+        game.touchDirs.add(dir);
+        btn.setPointerCapture && btn.setPointerCapture(event.pointerId);
+      };
+      const release = (event) => {
+        event.preventDefault();
+        game.touchDirs.delete(dir);
+      };
+      btn.addEventListener('pointerdown', press);
+      btn.addEventListener('pointerup', release);
+      btn.addEventListener('pointercancel', release);
+      btn.addEventListener('pointerleave', release);
+    });
+
+    if ('ResizeObserver' in window) {
+      new ResizeObserver(() => { if (state) { resizeCanvas(); updateCamera(0, true); } }).observe($('gameFrame'));
+    } else {
+      window.addEventListener('resize', () => { resizeCanvas(); updateCamera(0, true); });
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) saveState();
+      game.lastFrame = performance.now();
+      game.keys.clear();
+    });
+  }
+
+  init();
+
+})();
+</script>
+</body>
+</html>
